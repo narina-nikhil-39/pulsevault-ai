@@ -256,28 +256,48 @@ class PatientService:
         return result
 
     def supersede_medications(self, db: Session, patient: Patient) -> int:
-        """Backfill an end date on prescriptions that a document explicitly stopped.
+        """Backfill an end date and update status on prescriptions when a document marks a medication stopped.
 
         Prescriptions are superseded rather than deleted so the longitudinal history
-        remains reconstructable. Only medications the extraction marked as stopped are
-        touched; absence from a later prescription is never treated as discontinuation,
-        because a document that lists only its own drugs would otherwise wipe the record.
+        remains reconstructable. When a medication is marked stopped/discontinued, all
+        prior active rows for that medication are marked stopped with an end_date.
         """
         stopped = list(
             db.scalars(
                 select(Medication).where(
                     Medication.patient_id == patient.id,
-                    Medication.status == "stopped",
-                    Medication.end_date.is_(None),
+                    Medication.status.in_(["stopped", "discontinued"]),
                 )
             ).all()
         )
 
-        for medication in stopped:
-            medication.end_date = medication.start_date or date.today()
+        superseded_count = 0
+        for stopped_med in stopped:
+            med_name = (stopped_med.name or "").lower().strip()
+            if not med_name:
+                continue
+
+            active_priors = list(
+                db.scalars(
+                    select(Medication).where(
+                        Medication.patient_id == patient.id,
+                        Medication.status == "active",
+                        Medication.id != stopped_med.id,
+                    )
+                ).all()
+            )
+
+            for prior in active_priors:
+                if (prior.name or "").lower().strip() == med_name:
+                    prior.status = "stopped"
+                    prior.end_date = stopped_med.start_date or stopped_med.end_date or date.today()
+                    superseded_count += 1
+
+            if stopped_med.end_date is None:
+                stopped_med.end_date = stopped_med.start_date or date.today()
 
         db.flush()
-        return len(stopped)
+        return superseded_count
 
     def active_medications(self, db: Session, patient: Patient) -> List[Medication]:
         """Return every medication currently marked active for the patient."""

@@ -88,14 +88,13 @@ _OFFLINE_CONDITION_MAP: Dict[str, str] = {
 }
 
 _OFFLINE_PROCEDURE_MAP: Dict[str, str] = {
-    "coronary artery bypass graft": "8151",
-    "percutaneous coronary intervention": "3606",
-    "appendectomy": "4701",
-    "cholecystectomy": "5123",
-    "total knee replacement": "81.45",
-    "cataract surgery": "13.41",
-    "caesarean section": "740",
-    "normal delivery": "73.59",
+    "coronary artery bypass graft": "021009Z",
+    "percutaneous coronary intervention": "02703ZZ",
+    "appendectomy": "0DTJ0ZZ",
+    "cholecystectomy": "0FT44ZZ",
+    "total knee replacement": "0SRD0JZ",
+    "cataract surgery": "08RJ3JZ",
+    "caesarean section": "10D00Z0",
 }
 
 _OFFLINE_LAB_MAP: Dict[str, str] = {
@@ -208,6 +207,7 @@ class DrugLookupService:
 
     RXNORM_SYSTEM = "http://www.nlm.nih.gov/research/umls/rxnorm"
     ICD10_SYSTEM = "http://hl7.org/fhir/sid/icd-10-cm"
+    ICD10_PCS_SYSTEM = "http://hl7.org/fhir/sid/icd-10-pcs"
     SNOMED_SYSTEM = "http://snomed.info/sct"
     LOINC_SYSTEM = "http://loinc.org"
 
@@ -247,7 +247,7 @@ class DrugLookupService:
             return self._cache[key]
 
         cleaned = self._clean(name)
-        result = self._offline_lookup(cleaned, name, _OFFLINE_PROCEDURE_MAP, self.ICD10_SYSTEM)
+        result = self._offline_lookup(cleaned, name, _OFFLINE_PROCEDURE_MAP, self.ICD10_PCS_SYSTEM)
         self._cache[key] = result
         return result
 

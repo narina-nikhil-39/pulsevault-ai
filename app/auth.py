@@ -16,9 +16,11 @@ from typing import Dict, Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-# Fixed so the prototype token survives a server restart; the production design issues
-# per-session keys and revokes them centrally.
-_SECRET_KEY = os.getenv("AUTH_SECRET_KEY", "synapsehealth-dev-secret-do-not-use-in-production").encode()
+_DEFAULT_SECRET = "synapsehealth-dev-secret-do-not-use-in-production"
+_SECRET_KEY_STR = os.getenv("AUTH_SECRET_KEY", _DEFAULT_SECRET)
+if os.getenv("ENVIRONMENT") == "production" and _SECRET_KEY_STR == _DEFAULT_SECRET:
+    raise RuntimeError("AUTH_SECRET_KEY environment variable MUST be explicitly set in production mode.")
+_SECRET_KEY = _SECRET_KEY_STR.encode()
 _TOKEN_TTL_SECONDS = 8 * 60 * 60
 
 _bearer_scheme = HTTPBearer(auto_error=False)

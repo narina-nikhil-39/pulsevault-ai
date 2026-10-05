@@ -102,15 +102,16 @@ export function ageLabel(age: number | null | undefined): string {
 /** Render a lab value with its unit, preferring the server's preformatted text. */
 export function labDisplay(
   valueText: string | null | undefined,
+  numValue: number | null | undefined,
   unit: string | null | undefined,
 ): string {
   if (valueText) {
     return valueText
   }
-  if (value === null || value === undefined) {
+  if (numValue === null || numValue === undefined) {
     return '—'
   }
-  return unit ? `${value} ${unit}` : String(value)
+  return unit ? `${numValue} ${unit}` : String(numValue)
 }
 
 function value(value: number | null | undefined): string {

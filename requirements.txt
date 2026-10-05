@@ -14,7 +14,7 @@ google-genai>=1.0.0
 SQLAlchemy>=2.0.36
 
 # Document Ingestion & OCR
-PyMuPDF>=1.24.0
+PyMuPDF>=1.24.3
 pillow>=11.0.0
 
 # Synthetic Corpus Generation

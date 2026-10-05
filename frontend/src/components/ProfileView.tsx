@@ -18,7 +18,7 @@ function LabRow({ lab }: { lab: LabValue }) {
         </div>
       </td>
       <td className={`py-2 pr-3 text-right font-medium tabular-nums ${FLAG_TONE[(lab.flag ?? 'normal').toLowerCase()] ?? 'text-slate-300'}`}>
-        {labDisplay(lab.value_text, lab.unit)}
+        {labDisplay(lab.value_text, lab.value, lab.unit)}
       </td>
       <td className="py-2 pr-3 text-right text-xs text-slate-500">{formatDate(lab.collected_date)}</td>
       <td className="py-2 text-right">

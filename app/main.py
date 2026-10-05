@@ -6,6 +6,7 @@ the clinical profile, the emergency flashcard, and the access audit trail.
 
 from contextlib import asynccontextmanager
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
@@ -55,9 +56,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+_CORS_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -165,7 +173,8 @@ def upload_record(
         detail={"document_id": document.id, "filename": filename, "sha256": document.sha256},
     )
 
-    (get_upload_dir() / f"{document.id}_{filename}").write_bytes(file_bytes)
+    safe_filename = Path(filename).name
+    (get_upload_dir() / f"{document.id}_{safe_filename}").write_bytes(file_bytes)
 
     outcome = pipeline.run(db, patient, document, file_bytes)
 
@@ -359,3 +368,9 @@ def patient_audit(
             db, resource_id=patient.patient_code, limit=limit
         )
     ]
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)

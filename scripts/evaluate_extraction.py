@@ -104,9 +104,49 @@ class EvaluationReport:
 
 
 def _identity(group: str, item: Dict[str, Any]) -> str:
-    """Return the comparable identity of one extracted or expected entity."""
-    field_name = _IDENTITY_FIELD[group]
-    return " ".join(str(item.get(field_name) or "").lower().split()).strip()
+    """Return the comparable identity of one extracted or expected entity.
+    Compares entity name along with value/dose to verify extraction accuracy.
+    """
+    if group == "lab_values":
+        name = str(item.get("test_name") or "").lower().strip()
+        val = item.get("value")
+        if val is not None:
+            try:
+                val_str = f"{float(val):.2f}".rstrip("0").rstrip(".")
+            except (ValueError, TypeError):
+                val_str = str(val).lower().strip()
+        else:
+            val_str = str(item.get("value_text") or "").lower().strip()
+        unit = str(item.get("unit") or "").lower().strip()
+        parts = [name]
+        if val_str:
+            parts.append(val_str)
+        if unit:
+            parts.append(unit)
+        return "|".join(parts)
+    elif group == "medications":
+        name = str(item.get("name") or "").lower().strip()
+        dose = item.get("dose") or item.get("dosage")
+        if dose is not None:
+            try:
+                dose_str = f"{float(dose):.2f}".rstrip("0").rstrip(".")
+            except (ValueError, TypeError):
+                dose_str = str(dose).lower().strip()
+        else:
+            dose_str = ""
+        parts = [name]
+        if dose_str:
+            parts.append(dose_str)
+        return "|".join(parts)
+    elif group == "conditions":
+        name = str(item.get("name") or "").lower().strip()
+        return name
+    elif group == "allergies":
+        substance = str(item.get("substance") or "").lower().strip()
+        return substance
+    else:
+        field_name = _IDENTITY_FIELD.get(group, "name")
+        return " ".join(str(item.get(field_name) or "").lower().split()).strip()
 
 
 def _patient_key(item: Dict[str, Any]) -> str:

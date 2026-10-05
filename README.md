@@ -183,12 +183,13 @@ PYTHONPATH=. python scripts/evaluate_extraction.py
 
 ## Verification & Metric Results
 
-| Metric | Target / Score | Notes |
-| :--- | :--- | :--- |
-| **Pytest Suite** | **55 / 55 Passed** | Auth, API endpoints, pipeline stages, safety rules, evaluation |
+| Metric | Value | Notes |
+| :--- | :---: | :--- |
+| **Pytest Suite** | **55 / 55 Passed** | Auth, API endpoints, pipeline stages, safety rules, evaluation harness |
 | **Documents Scored** | **7 Documents** | Synthetic patient cohort (SH-1024, SH-2048, SH-3072) |
-| **Micro P / R / F1** | **1.00 / 1.00 / 1.00** | Full coverage across 43 ground-truth entities |
-| **Macro F1** | **1.00** | Balanced precision across all entity categories |
+| **Micro Precision / Recall / F1** | **0.9130 / 0.9767 / 0.9438** | Attribute-level evaluation (name, dose/value, unit verification) |
+| **Macro F1** | **0.9638** | Scored across all 6 clinical entity categories |
+| **Medication F1** | **0.7826** | Surfaced dosage extraction mismatches (e.g. unparsed vs parsed dose) |
 | **Frontend Build** | **Clean Build** | `tsc --noEmit` pass; 254 kB JS / 27 kB CSS production bundle |
 
 ---

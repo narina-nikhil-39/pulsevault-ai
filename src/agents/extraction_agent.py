@@ -23,7 +23,8 @@ from src.services.vision_service import VisionService, VisionServiceError
 # Curated clinical vocabulary for the offline fallback
 # ---------------------------------------------------------------------------
 _CONDITION_LEXICON: Tuple[Tuple[str, str, bool], ...] = (
-    (r"\btype\s*[12]\s*diabet|\bdiabet\w*\s*mellitus|\bdiabetes\b", "Type 2 Diabetes Mellitus", True),
+    (r"\btype\s*1\s*diabet|\btd1\b|\bt1d\b|\binsulin-dependent\s*diabet", "Type 1 Diabetes Mellitus", True),
+    (r"\btype\s*2\s*diabet|\btd2\b|\bt2d\b|\bnon-insulin-dependent\s*diabet|\bdiabet\w*\s*mellitus|\bdiabetes\b", "Type 2 Diabetes Mellitus", True),
     (r"\bessential\s*hypertension|\bhypertension\b|\bbp\s*(?:high|raised|elevated)", "Essential Hypertension", True),
     (r"\bcoronary\s*artery\s*disease|\bcad\b|\bischaemic\s*heart\s*disease", "Coronary Artery Disease", True),
     (r"\bmyocardial\s*infarction|\bheart\s*attack\b", "Myocardial Infarction", True),

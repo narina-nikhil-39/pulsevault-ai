@@ -207,11 +207,10 @@ To assess extraction accuracy without manual inspection, an automated scoring ha
 
 ```
 Documents Scored : 7
-Micro Precision  : 1.0000
-Micro Recall     : 1.0000
-Micro F1         : 1.0000
-Macro F1         : 1.0000
-Observed Errors  : 0
+Micro Precision  : 0.9130
+Micro Recall     : 0.9767
+Micro F1         : 0.9438
+Macro F1         : 0.9638
 ```
 
 #### Detailed Per-Group Performance:
@@ -219,7 +218,7 @@ Observed Errors  : 0
 | Entity Group | Precision | Recall | F1-Score | True Positives | False Positives | False Negatives |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Conditions** | 1.0000 | 1.0000 | 1.0000 | 9 | 0 | 0 |
-| **Medications** | 1.0000 | 1.0000 | 1.0000 | 10 | 0 | 0 |
+| **Medications** | 0.6923 | 0.9000 | 0.7826 | 9 | 4 | 1 |
 | **Allergies** | 1.0000 | 1.0000 | 1.0000 | 3 | 0 | 0 |
 | **Lab Values** | 1.0000 | 1.0000 | 1.0000 | 16 | 0 | 0 |
 | **Procedures** | 1.0000 | 1.0000 | 1.0000 | 4 | 0 | 0 |
@@ -230,13 +229,14 @@ Observed Errors  : 0
 ## 12. Defect Surface Analysis, Bug Fixes & Limitations
 
 ### 12.1 Bugs Identified and Fixed During Evaluation
-Development and evaluation surfaced four significant architectural defects, all of which were resolved:
-1. **Scoring Granularity Bug**: Initial evaluation scored per-document extractions against the entire cumulative patient record. A lab report was incorrectly flagged as having false negatives for medications prescribed in a separate document. *Fix*: Refactored evaluation logic to score at the document level for precision/hallucinations and patient level for cumulative state.
-2. **Unsatisfiable Ground-Truth Entries (x2)**: Two ground-truth entries in synthetic data contained typos not present in the rendered PDF documents. *Fix*: Corrected ground-truth generator to match exact document strings.
-3. **Procedure Double-Matching**: "Coronary Angiography" matched both the specific procedure and a generic "Angiography" pattern, generating a duplicate false positive. *Fix*: Implemented longest-match pattern precedence in the extraction matcher.
+Development and evaluation surfaced several architectural defects, all of which were analyzed and resolved:
+1. **Unfalsifiable Name-Only Evaluation**: Initial evaluation compared entity names alone, ignoring values, units, and dosages (e.g., HbA1c 8.2% vs 999% scored identically). *Fix*: Upgraded `_identity()` to enforce multi-attribute matching (test_name + value + unit, name + dose), uncovering genuine dosage extraction nuances (Medication F1: 0.7826).
+2. **Type 1 / Type 2 Diabetes Recoding Defect**: `extraction_agent.py` regex collapsed both Type 1 and Type 2 into Type 2 Diabetes Mellitus, corrupting ICD-10 `E10.9` mapping. *Fix*: Separated Type 1 and Type 2 regexes.
+3. **Invalid Procedure Ontology System**: Procedure codes contained legacy 4-digit ICD-9-CM codes mislabeled as ICD-10-CM. *Fix*: Updated to valid 7-character ICD-10-PCS codes under the `http://hl7.org/fhir/sid/icd-10-pcs` system URI.
+4. **Stale Active Medication Rows**: Prescriptions marking a drug stopped did not update prior active DB rows. *Fix*: Refactored `supersede_medications()` to update status to `stopped` and stamp `end_date`.
 
 ### 12.2 Limitations & Nuances
-- **Synthetic Ground-Truth Context**: The 1.00 F1 score reflects internal consistency and regression safety across synthetic test cases. It does not represent clinical validation on real-world noisy hospital EHR records.
+- **Synthetic Ground-Truth Context**: The synthetic corpus acts as a regression guard for pipeline consistency. Real clinical accuracy must be validated against de-identified benchmarks (e.g., MIMIC-IV).
 - **Unconfigured Vision Model**: In offline mode, scanned PDF images rely on fallback text layers. Enabling `GEMINI_API_KEY` unlocks true multimodal vision OCR for scanned paper documents.
 
 ---
