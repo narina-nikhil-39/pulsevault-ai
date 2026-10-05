@@ -1,0 +1,30 @@
+# SynapseHealth — Python Dependencies
+# Install with:  pip install -r requirements.txt
+
+# Web Gateway
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.9.0
+python-multipart>=0.0.12
+
+# AI / LLM Extraction
+google-genai>=1.0.0
+
+# Persistence
+SQLAlchemy>=2.0.36
+
+# Document Ingestion & OCR
+PyMuPDF>=1.24.0
+pillow>=11.0.0
+
+# Synthetic Corpus Generation
+reportlab>=4.2.5
+
+# HTTP Client (openFDA / RxNav)
+httpx>=0.27.2
+
+# Configuration
+python-dotenv>=1.0.1
+
+# Testing
+pytest>=8.3.0

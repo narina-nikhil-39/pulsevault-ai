@@ -1,0 +1,82 @@
+{
+  "patient_demographics": {
+    "name": "Ananya Iyer",
+    "age": 34,
+    "sex": "F",
+    "blood_group": "A-"
+  },
+  "conditions": [
+    {
+      "name": "Iron Deficiency Anaemia",
+      "onset_date": "2023-12-04",
+      "status": "resolved",
+      "is_chronic": false
+    },
+    {
+      "name": "Migraine",
+      "onset_date": "2020-07-19",
+      "status": "active",
+      "is_chronic": true
+    }
+  ],
+  "medications": [
+    {
+      "name": "Paracetamol",
+      "dose": 500,
+      "dose_unit": "mg",
+      "frequency": "as needed",
+      "route": "oral",
+      "start_date": "2024-03-02",
+      "status": "active"
+    },
+    {
+      "name": "Ferrous Sulphate",
+      "dose": 325,
+      "dose_unit": "mg",
+      "frequency": "twice daily",
+      "route": "oral",
+      "start_date": "2023-12-04",
+      "status": "stopped",
+      "end_date": "2024-02-20"
+    }
+  ],
+  "allergies": [
+    {
+      "substance": "Sulfonamide",
+      "reaction": "Rash",
+      "severity": "moderate"
+    }
+  ],
+  "lab_values": [
+    {
+      "test_name": "Hemoglobin",
+      "value": 9.8,
+      "unit": "g/dL",
+      "collected_date": "2024-02-18"
+    },
+    {
+      "test_name": "Ferritin",
+      "value": 8,
+      "unit": "ng/mL",
+      "collected_date": "2024-02-18"
+    },
+    {
+      "test_name": "Platelet Count",
+      "value": 268,
+      "unit": "/cumm",
+      "collected_date": "2024-02-18"
+    }
+  ],
+  "procedures": [
+    {
+      "name": "Colonoscopy",
+      "performed_date": "2024-01-15",
+      "outcome": "Normal"
+    }
+  ],
+  "implants": [],
+  "safety_expectations": {
+    "expect_any_critical": true,
+    "expected_rule_ids": []
+  }
+}

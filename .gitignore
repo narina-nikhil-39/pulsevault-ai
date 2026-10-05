@@ -1,0 +1,49 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+.output/
+.npm
+*.log
+
+# IDEs & System
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Archives & Temp
+*.zip
+*.tar.gz
+
+# Runtime Data & Generated Corpus
+data/*.db
+data/*.db-journal
+data/uploads/*
+!data/uploads/.gitkeep
+data/test_uploads/*
+!data/test_uploads/.gitkeep
+data/corpus/generated/*
+!data/corpus/generated/.gitkeep

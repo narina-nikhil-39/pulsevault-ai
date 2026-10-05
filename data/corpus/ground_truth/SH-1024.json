@@ -1,0 +1,120 @@
+{
+  "patient_demographics": {
+    "name": "Ramesh Kumar",
+    "age": 58,
+    "sex": "M",
+    "blood_group": "B+"
+  },
+  "conditions": [
+    {
+      "name": "Type 2 Diabetes Mellitus",
+      "onset_date": "2019-06-14",
+      "status": "active",
+      "is_chronic": true
+    },
+    {
+      "name": "Essential Hypertension",
+      "onset_date": "2021-02-03",
+      "status": "active",
+      "is_chronic": true
+    },
+    {
+      "name": "Dyslipidemia",
+      "onset_date": "2022-09-20",
+      "status": "active",
+      "is_chronic": true
+    }
+  ],
+  "medications": [
+    {
+      "name": "Metformin",
+      "dose": 500,
+      "dose_unit": "mg",
+      "frequency": "twice daily",
+      "route": "oral",
+      "start_date": "2019-06-14",
+      "status": "active"
+    },
+    {
+      "name": "Telmisartan",
+      "dose": 40,
+      "dose_unit": "mg",
+      "frequency": "once daily",
+      "route": "oral",
+      "start_date": "2021-02-03",
+      "status": "active"
+    },
+    {
+      "name": "Atorvastatin",
+      "dose": 10,
+      "dose_unit": "mg",
+      "frequency": "nightly",
+      "route": "oral",
+      "start_date": "2022-09-20",
+      "status": "active"
+    }
+  ],
+  "allergies": [
+    {
+      "substance": "Penicillin",
+      "reaction": "Urticaria",
+      "severity": "severe"
+    }
+  ],
+  "lab_values": [
+    {
+      "test_name": "HbA1c",
+      "value": 8.2,
+      "unit": "%",
+      "collected_date": "2024-03-05"
+    },
+    {
+      "test_name": "LDL Cholesterol",
+      "value": 145,
+      "unit": "mg/dL",
+      "collected_date": "2024-03-05"
+    },
+    {
+      "test_name": "Total Cholesterol",
+      "value": 232,
+      "unit": "mg/dL",
+      "collected_date": "2024-03-05"
+    },
+    {
+      "test_name": "Serum Creatinine",
+      "value": 1.1,
+      "unit": "mg/dL",
+      "collected_date": "2024-03-05"
+    },
+    {
+      "test_name": "eGFR",
+      "value": 78,
+      "unit": "mL/min/1.73m2",
+      "collected_date": "2024-03-05"
+    },
+    {
+      "test_name": "Hemoglobin",
+      "value": 14.2,
+      "unit": "g/dL",
+      "collected_date": "2024-03-05"
+    },
+    {
+      "test_name": "Platelet Count",
+      "value": 240,
+      "unit": "/cumm",
+      "collected_date": "2024-03-05"
+    }
+  ],
+  "procedures": [
+    {
+      "name": "Coronary Angiography",
+      "performed_date": "2022-09-18",
+      "outcome": "Normal coronaries"
+    }
+  ],
+  "implants": [],
+  "safety_expectations": {
+    "expect_any_critical": true,
+    "expected_rule_ids": []
+  }
+}

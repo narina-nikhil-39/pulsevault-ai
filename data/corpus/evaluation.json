@@ -1,0 +1,70 @@
+{
+  "documents_scored": 7,
+  "micro": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "true_positive": 43,
+    "false_positive": 0,
+    "false_negative": 0,
+    "support": 43
+  },
+  "macro_f1": 1.0,
+  "per_group": {
+    "conditions": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "true_positive": 9,
+      "false_positive": 0,
+      "false_negative": 0,
+      "support": 9
+    },
+    "medications": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "true_positive": 10,
+      "false_positive": 0,
+      "false_negative": 0,
+      "support": 10
+    },
+    "allergies": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "true_positive": 3,
+      "false_positive": 0,
+      "false_negative": 0,
+      "support": 3
+    },
+    "lab_values": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "true_positive": 16,
+      "false_positive": 0,
+      "false_negative": 0,
+      "support": 16
+    },
+    "procedures": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "true_positive": 4,
+      "false_positive": 0,
+      "false_negative": 0,
+      "support": 4
+    },
+    "implants": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "true_positive": 1,
+      "false_positive": 0,
+      "false_negative": 0,
+      "support": 1
+    }
+  },
+  "observed_errors": []
+}

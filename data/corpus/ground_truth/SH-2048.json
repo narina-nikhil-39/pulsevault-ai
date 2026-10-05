@@ -1,0 +1,148 @@
+{
+  "patient_demographics": {
+    "name": "Lakshmi Devi",
+    "age": 64,
+    "sex": "F",
+    "blood_group": "O+"
+  },
+  "conditions": [
+    {
+      "name": "Atrial Fibrillation",
+      "onset_date": "2021-11-02",
+      "status": "active",
+      "is_chronic": true
+    },
+    {
+      "name": "Chronic Kidney Disease",
+      "onset_date": "2022-08-19",
+      "status": "active",
+      "is_chronic": true
+    },
+    {
+      "name": "Type 2 Diabetes Mellitus",
+      "onset_date": "2018-05-30",
+      "status": "active",
+      "is_chronic": true
+    },
+    {
+      "name": "Peptic Ulcer Disease",
+      "onset_date": "2023-04-11",
+      "status": "active",
+      "is_chronic": true
+    }
+  ],
+  "medications": [
+    {
+      "name": "Warfarin",
+      "dose": 2,
+      "dose_unit": "mg",
+      "frequency": "once daily",
+      "route": "oral",
+      "start_date": "2021-11-02",
+      "status": "active"
+    },
+    {
+      "name": "Aspirin",
+      "dose": 75,
+      "dose_unit": "mg",
+      "frequency": "once daily",
+      "route": "oral",
+      "start_date": "2023-04-11",
+      "status": "active"
+    },
+    {
+      "name": "Sertraline",
+      "dose": 50,
+      "dose_unit": "mg",
+      "frequency": "once daily",
+      "route": "oral",
+      "start_date": "2022-10-05",
+      "status": "active"
+    },
+    {
+      "name": "Metformin",
+      "dose": 500,
+      "dose_unit": "mg",
+      "frequency": "twice daily",
+      "route": "oral",
+      "start_date": "2018-05-30",
+      "status": "active"
+    },
+    {
+      "name": "Amoxicillin",
+      "dose": 500,
+      "dose_unit": "mg",
+      "frequency": "three times daily",
+      "route": "oral",
+      "start_date": "2024-03-01",
+      "status": "active"
+    }
+  ],
+  "allergies": [
+    {
+      "substance": "Penicillin",
+      "reaction": "Anaphylaxis",
+      "severity": "severe"
+    }
+  ],
+  "lab_values": [
+    {
+      "test_name": "Serum Creatinine",
+      "value": 2.4,
+      "unit": "mg/dL",
+      "collected_date": "2024-03-05"
+    },
+    {
+      "test_name": "HbA1c",
+      "value": 7.9,
+      "unit": "%",
+      "collected_date": "2024-03-05"
+    },
+    {
+      "test_name": "Serum Potassium",
+      "value": 5.4,
+      "unit": "mEq/L",
+      "collected_date": "2024-03-05"
+    },
+    {
+      "test_name": "Platelet Count",
+      "value": 142,
+      "unit": "/cumm",
+      "collected_date": "2024-03-05"
+    },
+    {
+      "test_name": "INR",
+      "value": 3.4,
+      "unit": null,
+      "collected_date": "2024-03-05"
+    },
+    {
+      "test_name": "Hemoglobin",
+      "value": 9.8,
+      "unit": "g/dL",
+      "collected_date": "2024-03-05"
+    }
+  ],
+  "procedures": [
+    {
+      "name": "Echocardiography",
+      "performed_date": "2023-01-24",
+      "outcome": "Normal LVEF"
+    },
+    {
+      "name": "Haemodialysis",
+      "performed_date": "2024-02-15",
+      "outcome": "Well tolerated"
+    }
+  ],
+  "implants": [
+    {
+      "name": "Permanent Pacemaker",
+      "implanted_date": "2023-03-02"
+    }
+  ],
+  "safety_expectations": {
+    "expect_any_critical": true,
+    "expected_rule_ids": []
+  }
+}

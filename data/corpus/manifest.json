@@ -1,0 +1,44 @@
+[
+  {
+    "filename": "SH-1024_discharge_summary.pdf",
+    "patient_code": "SH-1024",
+    "expected_doc_type": "discharge_summary",
+    "ground_truth": "ground_truth/SH-1024.json"
+  },
+  {
+    "filename": "SH-1024_lab_report.pdf",
+    "patient_code": "SH-1024",
+    "expected_doc_type": "lab_report",
+    "ground_truth": "ground_truth/SH-1024.json"
+  },
+  {
+    "filename": "SH-2048_prescription.pdf",
+    "patient_code": "SH-2048",
+    "expected_doc_type": "prescription",
+    "ground_truth": "ground_truth/SH-2048.json"
+  },
+  {
+    "filename": "SH-2048_lab_report.pdf",
+    "patient_code": "SH-2048",
+    "expected_doc_type": "lab_report",
+    "ground_truth": "ground_truth/SH-2048.json"
+  },
+  {
+    "filename": "SH-2048_renal_followup.pdf",
+    "patient_code": "SH-2048",
+    "expected_doc_type": "diagnostic_report",
+    "ground_truth": "ground_truth/SH-2048.json"
+  },
+  {
+    "filename": "SH-3072_discharge_summary.pdf",
+    "patient_code": "SH-3072",
+    "expected_doc_type": "discharge_summary",
+    "ground_truth": "ground_truth/SH-3072.json"
+  },
+  {
+    "filename": "SH-3072_lab_report.pdf",
+    "patient_code": "SH-3072",
+    "expected_doc_type": "lab_report",
+    "ground_truth": "ground_truth/SH-3072.json"
+  }
+]
