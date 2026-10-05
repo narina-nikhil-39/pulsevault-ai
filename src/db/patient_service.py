@@ -495,7 +495,7 @@ class PatientService:
                     "category": alert.category,
                     "title": alert.title,
                     "detail": alert.detail,
-                    "involved": alert.involved,
+                    "involved": [item.strip() for item in alert.involved.split(",") if item.strip()] if alert.involved else [],
                     "recommendation": alert.recommendation,
                 }
                 for alert in alerts

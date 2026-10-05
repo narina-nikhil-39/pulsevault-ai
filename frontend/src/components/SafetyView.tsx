@@ -4,6 +4,12 @@ import { Empty, Panel, SeverityChip, Stat } from './Primitives'
 
 function AlertCard({ alert }: { alert: SafetyAlert }) {
   const palette = tone(alert.severity)
+  const involvedList = Array.isArray(alert.involved)
+    ? alert.involved
+    : typeof alert.involved === 'string'
+    ? (alert.involved as string).split(',').map((s) => s.trim()).filter(Boolean)
+    : []
+
   return (
     <li className={`rounded-lg border bg-slate-950/40 p-3 ${palette.border}`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -16,9 +22,9 @@ function AlertCard({ alert }: { alert: SafetyAlert }) {
 
       {alert.detail ? <p className="mt-2 text-xs text-slate-400">{alert.detail}</p> : null}
 
-      {alert.involved.length > 0 ? (
+      {involvedList.length > 0 ? (
         <div className="mt-2 flex flex-wrap gap-1.5">
-          {alert.involved.map((item) => (
+          {involvedList.map((item) => (
             <span
               key={item}
               className="chip border-slate-700 bg-slate-900 text-[11px] text-slate-300"
