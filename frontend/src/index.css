@@ -7,52 +7,50 @@
 
 @layer base {
   html {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
-    @apply bg-slate-950 text-slate-100 antialiased;
+    @apply bg-[#F8FAFC] text-slate-900 antialiased font-sans;
   }
 
-  /* Keyboard users must always be able to see where they are. */
+  /* Keyboard accessibility */
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-cyan-400;
+    @apply outline-2 outline-offset-2 outline-blue-600;
   }
 }
 
 @layer components {
   .panel {
-    @apply rounded-xl border border-slate-800 bg-slate-900/60;
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-sm;
   }
 
   .panel-header {
-    @apply flex items-center justify-between gap-3 border-b border-slate-800 px-4 py-3;
+    @apply flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4;
   }
 
   .panel-title {
-    @apply text-sm font-semibold tracking-wide text-slate-200 uppercase;
+    @apply text-sm font-semibold tracking-wide text-slate-800;
   }
 
-  /* Tailwind v4 cannot `@apply` a custom class, so the shared button base is declared
-     once across all three selectors and the variants only override colour. */
   .btn,
   .btn-primary,
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium
            transition-colors disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-primary {
-    @apply bg-cyan-500 text-slate-950 hover:bg-cyan-400;
+    @apply bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-500/20 font-semibold;
   }
 
   .btn-ghost {
-    @apply border border-slate-700 text-slate-300 hover:bg-slate-800;
+    @apply border border-slate-200 bg-white text-slate-700 hover:bg-slate-50;
   }
 
   .field {
-    @apply w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100
-           placeholder:text-slate-600;
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800
+           placeholder:text-slate-400 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600;
   }
 
   .chip {

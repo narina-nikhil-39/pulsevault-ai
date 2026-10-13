@@ -16,34 +16,34 @@ export interface Tone {
 
 const TONES: Record<Severity, Tone> = {
   critical: {
-    chip: 'border-red-500/40 bg-red-500/10 text-red-300',
-    dot: 'bg-red-500',
-    border: 'border-red-500/30',
-    text: 'text-red-300',
+    chip: 'border-rose-200 bg-rose-50 text-rose-700',
+    dot: 'bg-rose-500',
+    border: 'border-rose-200',
+    text: 'text-rose-700',
   },
   high: {
-    chip: 'border-orange-500/40 bg-orange-500/10 text-orange-300',
+    chip: 'border-orange-200 bg-orange-50 text-orange-700',
     dot: 'bg-orange-500',
-    border: 'border-orange-500/30',
-    text: 'text-orange-300',
+    border: 'border-orange-200',
+    text: 'text-orange-700',
   },
   moderate: {
-    chip: 'border-amber-500/40 bg-amber-500/10 text-amber-300',
+    chip: 'border-amber-200 bg-amber-50 text-amber-700',
     dot: 'bg-amber-500',
-    border: 'border-amber-500/30',
-    text: 'text-amber-300',
+    border: 'border-amber-200',
+    text: 'text-amber-700',
   },
   low: {
-    chip: 'border-sky-500/40 bg-sky-500/10 text-sky-300',
+    chip: 'border-sky-200 bg-sky-50 text-sky-700',
     dot: 'bg-sky-500',
-    border: 'border-sky-500/30',
-    text: 'text-sky-300',
+    border: 'border-sky-200',
+    text: 'text-sky-700',
   },
   info: {
-    chip: 'border-slate-600 bg-slate-800 text-slate-300',
-    dot: 'bg-slate-500',
-    border: 'border-slate-700',
-    text: 'text-slate-300',
+    chip: 'border-slate-200 bg-slate-100 text-slate-700',
+    dot: 'bg-slate-400',
+    border: 'border-slate-200',
+    text: 'text-slate-700',
   },
 }
 

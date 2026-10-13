@@ -449,6 +449,7 @@ class PatientService:
                 "sex": patient.sex,
                 "blood_group": patient.blood_group,
                 "contact": patient.contact,
+                "emergency_contact": patient.emergency_contact,
             },
             "record_count": len(documents),
             "conditions": [
@@ -503,7 +504,7 @@ class PatientService:
             "documents": [
                 _serialize(
                     document,
-                    fields=("id", "filename", "doc_type", "page_count", "extraction_method", "processed_at"),
+                    fields=("id", "filename", "doc_type", "page_count", "extraction_method", "processed_at", "uploaded_at"),
                 )
                 for document in documents
             ],

@@ -250,3 +250,38 @@ class AuditEvent(Base):
     resource_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     detail_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class AuditChainBlock(Base):
+    """Cryptographic append-only ledger block for break-glass and emergency events."""
+
+    __tablename__ = "audit_chain_blocks"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    block_index: Mapped[int] = mapped_column(Integer, unique=True, index=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    actor_doctor: Mapped[str] = mapped_column(String(64), index=True)
+    actor_nurse: Mapped[str] = mapped_column(String(64), index=True)
+    patient_code: Mapped[str] = mapped_column(String(64), index=True)
+    clinical_reason_code: Mapped[str] = mapped_column(String(64), index=True)
+    justification: Mapped[str] = mapped_column(Text)
+    prev_hash: Mapped[str] = mapped_column(String(64))
+    payload_hash: Mapped[str] = mapped_column(String(64))
+    current_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+
+
+class Appointment(Base):
+    """A scheduled or checked-in clinic appointment / reception queue record."""
+
+    __tablename__ = "appointments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    patient_code: Mapped[str] = mapped_column(String(32), index=True)
+    token_number: Mapped[str] = mapped_column(String(16), index=True)
+    patient_name: Mapped[str] = mapped_column(String(128), index=True)
+    department: Mapped[str] = mapped_column(String(64), default="General Medicine")
+    doctor_name: Mapped[str] = mapped_column(String(128), default="Dr. Meera Thomas")
+    scheduled_time: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(32), default="waiting", index=True)  # waiting, checked_in, in_consultation, consulted, cancelled
+    chief_complaint: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

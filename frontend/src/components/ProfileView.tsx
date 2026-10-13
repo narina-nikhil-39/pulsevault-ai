@@ -1,5 +1,7 @@
-import type { LabValue, PatientProfile } from '../api'
+import { useState } from 'react'
+import type { LabValue, PatientProfile, Sourced } from '../api'
 import { ageLabel, formatDate, labDisplay, medicationDose } from '../format'
+import { CitationModal } from './CitationModal'
 import { CodeChip, Empty, Panel, Stat } from './Primitives'
 
 const FLAG_TONE: Record<string, string> = {
@@ -37,6 +39,7 @@ function LabRow({ lab }: { lab: LabValue }) {
 /** Consolidated longitudinal record: demographics, entities, and provenance. */
 export function ProfileView({ profile }: { profile: PatientProfile }) {
   const { patient } = profile
+  const [citation, setCitation] = useState<{ sourced: Sourced; name: string; category: string } | null>(null)
 
   return (
     <div className="space-y-4">
@@ -84,7 +87,19 @@ export function ProfileView({ profile }: { profile: PatientProfile }) {
                     ) : null}
                     {condition.is_chronic ? <span className="text-slate-400">Chronic</span> : null}
                     {condition.source_document_id ? (
-                      <span className="font-mono">src #{condition.source_document_id}</span>
+                      <button
+                        onClick={() =>
+                          setCitation({
+                            sourced: condition,
+                            name: condition.name,
+                            category: 'Clinical Condition',
+                          })
+                        }
+                        className="font-mono text-cyan-400 hover:text-cyan-300 hover:underline flex items-center gap-0.5"
+                        title="Click to view anchored source document span"
+                      >
+                        🔍 src #{condition.source_document_id}
+                      </button>
                     ) : null}
                   </div>
                 </li>
@@ -123,7 +138,19 @@ export function ProfileView({ profile }: { profile: PatientProfile }) {
                     {medication.route ? <span>{medication.route}</span> : null}
                     <span>Since {formatDate(medication.start_date)}</span>
                     {medication.source_document_id ? (
-                      <span className="font-mono">src #{medication.source_document_id}</span>
+                      <button
+                        onClick={() =>
+                          setCitation({
+                            sourced: medication,
+                            name: medication.name,
+                            category: 'Prescribed Medication',
+                          })
+                        }
+                        className="font-mono text-cyan-400 hover:text-cyan-300 hover:underline flex items-center gap-0.5"
+                        title="Click to view anchored source document span"
+                      >
+                        🔍 src #{medication.source_document_id}
+                      </button>
                     ) : null}
                   </div>
                 </li>
@@ -146,9 +173,26 @@ export function ProfileView({ profile }: { profile: PatientProfile }) {
                     <span className="text-sm font-medium text-amber-100">{allergy.substance}</span>
                     <CodeChip code={allergy.snomed_code} />
                   </div>
-                  <div className="mt-1 flex flex-wrap gap-x-3 text-[11px] text-slate-500">
-                    {allergy.reaction ? <span>Reaction: {allergy.reaction}</span> : null}
-                    {allergy.severity ? <span>Severity: {allergy.severity}</span> : null}
+                  <div className="mt-1 flex flex-wrap items-center justify-between gap-x-3 text-[11px] text-slate-500">
+                    <div className="flex items-center gap-2">
+                      {allergy.reaction ? <span>Reaction: {allergy.reaction}</span> : null}
+                      {allergy.severity ? <span>Severity: {allergy.severity}</span> : null}
+                    </div>
+                    {allergy.source_document_id ? (
+                      <button
+                        onClick={() =>
+                          setCitation({
+                            sourced: allergy,
+                            name: allergy.substance,
+                            category: 'Documented Allergy',
+                          })
+                        }
+                        className="font-mono text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-0.5"
+                        title="Click to view anchored source document span"
+                      >
+                        🔍 src #{allergy.source_document_id}
+                      </button>
+                    ) : null}
                   </div>
                 </li>
               ))}
@@ -252,6 +296,16 @@ export function ProfileView({ profile }: { profile: PatientProfile }) {
           </div>
         )}
       </Panel>
+
+      {citation ? (
+        <CitationModal
+          sourced={citation.sourced}
+          entityName={citation.name}
+          entityCategory={citation.category}
+          documents={profile.documents}
+          onClose={() => setCitation(null)}
+        />
+      ) : null}
     </div>
   )
 }

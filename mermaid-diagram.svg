@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1781.4799999999998 1321.9" width="1781.4799999999998" height="1321.9" style="--bg:#1F1F1F;--fg:#CCCCCC;--line:#CCCCCC;--accent:#0078D4;--muted:#CCCCCCCC;--surface:#181818;--border:#CCCCCC;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<g class="subgraph" data-id="ClientLayer" data-label="Frontend Layer (React 19 + Vite 8 + Tailwind 4)">
+  <rect x="40" y="40" width="1701.4799999999998" height="96.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="40" y="40" width="1701.4799999999998" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="52" y="54" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Frontend Layer (React 19 + Vite 8 + Tailwind 4)</text>
+</g>
+<g class="subgraph" data-id="GatewayLayer" data-label="API Gateway Layer (FastAPI)">
+  <rect x="281.67674999999997" y="196.9" width="797.0169999999998" height="96.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="281.67674999999997" y="196.9" width="797.0169999999998" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="293.67674999999997" y="210.9" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">API Gateway Layer (FastAPI)</text>
+</g>
+<g class="subgraph" data-id="AgentPipeline" data-label="7-Stage Multi-Agent Processing Pipeline">
+  <rect x="464.99974999999995" y="353.8" width="924.2129999999997" height="606.3" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="464.99974999999995" y="353.8" width="924.2129999999997" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="476.99974999999995" y="367.8" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">7-Stage Multi-Agent Processing Pipeline</text>
+</g>
+<g class="subgraph" data-id="StorageLayer" data-label="Data &amp; Persistence Layer">
+  <rect x="892.0409999999997" y="1020.0999999999999" width="409.178" height="110.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="892.0409999999997" y="1020.0999999999999" width="409.178" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="904.0409999999997" y="1034.1" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Data &amp; Persistence Layer</text>
+</g>
+<g class="subgraph" data-id="ExternalApis" data-label="External Clinical Lexicon Services">
+  <rect x="358.74879166666653" y="1185" width="712.9879999999998" height="96.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="358.74879166666653" y="1185" width="712.9879999999998" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="370.74879166666653" y="1199" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">External Clinical Lexicon Services</text>
+</g>
+<polyline class="edge" data-from="UI" data-to="API" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="671.8489999999998,120.9 671.8489999999999,178.9 656.4732499999999,178.9 656.4732499999999,240.9" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="AuthView" data-to="JWT" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="901.4844999999998,120.9 901.4844999999998,178.9 916.86025,178.9 916.8602499999998,240.9" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="API" data-to="Stage1" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="656.4732499999999,277.8 656.4732499999999,397.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage1" data-to="GeminiAPI" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="Vision OCR" points="597.9820833333332,434.70000000000005 597.9820833333332,446.70000000000005 565.4594999999999,446.70000000000005 565.4594999999999,1098.7 478.48429166666654,1098.7 478.48429166666654,1167 476.91112499999986,1167 476.91112499999986,1229" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage2" data-to="GeminiAPI" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="Structured Extraction" points="690.4778333333333,519.6 690.4778333333333,531.6 654.9912499999999,531.6 654.9912499999999,1098.7 579.0734583333332,1098.7 579.0734583333332,1229" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage3" data-to="RxNavAPI" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="RxNorm Codes" points="781.9855833333332,604.5 781.9855833333332,616.5 729.703,616.5 729.703,1098.7 766.327,1098.7 766.327,1167 882.4862916666664,1167 882.4862916666664,1229" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage4" data-to="DB" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="950.2624999999999,689.4 950.2624999999999,713.4000000000001 1000.8929999999997,713.4000000000001 1000.8929999999997,1064.1" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage5" data-to="DB" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1040.53525,774.3000000000001 1040.53525,798.3 1000.8929999999997,798.3 1000.8929999999997,1064.1" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage6" data-to="DB" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1136.18025,859.1999999999999 1136.18025,883.2 1000.8929999999997,883.2 1000.8929999999997,1064.1" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage7" data-to="AuditStore" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1218.8577499999997,944.0999999999999 1218.8577499999997,1002.0999999999999 1203.4819999999997,1002.0999999999999 1203.4819999999995,1064.1" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage1" data-to="Stage2" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="714.9644166666666,434.70000000000005 714.9644166666666,446.70000000000005 747.4869999999999,446.70000000000005 747.4869999999999,482.70000000000005" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage2" data-to="Stage3" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="804.4961666666666,519.6 804.4961666666666,531.6 839.9827499999999,531.6 839.9827499999999,567.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage3" data-to="Stage4" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="897.9799166666666,604.5 897.9799166666666,616.5 950.2624999999998,616.5 950.2624999999998,652.5" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage4" data-to="Stage5" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="950.2624999999999,689.4 950.2624999999999,713.4000000000001 1040.53525,713.4000000000001 1040.53525,737.4000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage5" data-to="Stage6" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1040.53525,774.3000000000001 1040.53525,798.3 1136.18025,798.3 1136.18025,822.3" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Stage6" data-to="Stage7" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1136.18025,859.1999999999999 1136.18025,883.2 1218.85775,883.2 1218.85775,907.2" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="Stage1" data-to="GeminiAPI" data-label="Vision OCR">
+  <rect x="442.98429166666654" y="1105.7" width="70.516" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="478.2422916666665" y="1120.8500000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Vision OCR</text>
+</g>
+<g class="edge-label" data-from="Stage2" data-to="GeminiAPI" data-label="Structured Extraction">
+  <rect x="519.0734583333333" y="1105.7" width="119.22400000000002" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="578.6854583333333" y="1120.8500000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Structured Extraction</text>
+</g>
+<g class="edge-label" data-from="Stage3" data-to="RxNavAPI" data-label="RxNorm Codes">
+  <rect x="721.827" y="1105.7" width="88.33600000000001" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="765.995" y="1120.8500000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">RxNorm Codes</text>
+</g>
+<g class="node" data-id="UI" data-label="React SPA Single Page App" data-shape="rectangle">
+  <rect x="570.1049999999998" y="84" width="203.488" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="671.8489999999998" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">React SPA Single Page App</text>
+</g>
+<g class="node" data-id="AuthView" data-label="Login &amp; Authentication Gate" data-shape="rectangle">
+  <rect x="801.5929999999998" y="84" width="199.78299999999996" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="901.4844999999998" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Login &amp; Authentication Gate</text>
+</g>
+<g class="node" data-id="IngestView" data-label="Document Ingestion &amp; Live Agent Trace" data-shape="rectangle">
+  <rect x="272.6679999999999" y="84" width="269.43699999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="407.38649999999984" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Document Ingestion &amp; Live Agent Trace</text>
+</g>
+<g class="node" data-id="PatientView" data-label="Patient Profile &amp; Summary" data-shape="rectangle">
+  <rect x="1029.3759999999997" y="84" width="189.409" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1124.0804999999998" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Patient Profile &amp; Summary</text>
+</g>
+<g class="node" data-id="TimelineView" data-label="Temporal Graph Timeline" data-shape="rectangle">
+  <rect x="56" y="84" width="188.66799999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="150.33399999999997" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Temporal Graph Timeline</text>
+</g>
+<g class="node" data-id="SafetyView" data-label="Safety Alerts &amp; Rule Checker" data-shape="rectangle">
+  <rect x="1246.7849999999999" y="84" width="209.41600000000003" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1351.493" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Safety Alerts &amp; Rule Checker</text>
+</g>
+<g class="node" data-id="FlashcardView" data-label="Emergency Flashcard &amp; Summary" data-shape="rectangle">
+  <rect x="1484.2009999999998" y="84" width="241.279" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1604.8404999999998" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Emergency Flashcard &amp; Summary</text>
+</g>
+<g class="node" data-id="API" data-label="FastAPI Gateway (/api)" data-shape="rectangle">
+  <rect x="569.9197499999999" y="240.9" width="173.10699999999997" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="656.4732499999999" y="259.35" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">FastAPI Gateway (/api)</text>
+</g>
+<g class="node" data-id="JWT" data-label="PBKDF2 Password Hashing &amp; Bearer Auth" data-shape="rectangle">
+  <rect x="771.0267499999999" y="240.9" width="291.6669999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="916.8602499999998" y="259.35" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">PBKDF2 Password Hashing &amp; Bearer Auth</text>
+</g>
+<g class="node" data-id="CORS" data-label="Strict CORS &amp; Security Middleware" data-shape="rectangle">
+  <rect x="297.67674999999997" y="240.9" width="244.24299999999997" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="419.79824999999994" y="259.35" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Strict CORS &amp; Security Middleware</text>
+</g>
+<g class="node" data-id="Stage1" data-label="1. Ingestion Agent (PyMuPDF OCR / Lexicon Fallback)" data-shape="rectangle">
+  <rect x="480.99974999999995" y="397.8" width="350.9469999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="656.4732499999999" y="416.25" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">1. Ingestion Agent (PyMuPDF OCR / Lexicon Fallback)</text>
+</g>
+<g class="node" data-id="Stage2" data-label="2. Extraction Agent (Gemini 2.5 Flash / Lexicon NLP)" data-shape="rectangle">
+  <rect x="576.4594999999999" y="482.70000000000005" width="342.05499999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="747.4869999999999" y="501.15000000000003" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">2. Extraction Agent (Gemini 2.5 Flash / Lexicon NLP)</text>
+</g>
+<g class="node" data-id="Stage3" data-label="3. Terminology Agent (RxNorm &amp; ICD-10-PCS Mapper)" data-shape="rectangle">
+  <rect x="665.9912499999999" y="567.6" width="347.98299999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="839.9827499999999" y="586.0500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">3. Terminology Agent (RxNorm &amp; ICD-10-PCS Mapper)</text>
+</g>
+<g class="node" data-id="Stage4" data-label="4. Temporal Graph Agent (Chronological Timeline &amp; Superseding)" data-shape="rectangle">
+  <rect x="740.703" y="652.5" width="419.1189999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="950.2624999999999" y="670.95" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">4. Temporal Graph Agent (Chronological Timeline &amp; Superseding)</text>
+</g>
+<g class="node" data-id="Stage5" data-label="5. Deterministic Safety Agent (Metformin/CrCl Rules)" data-shape="rectangle">
+  <rect x="870.9897499999998" y="737.4000000000001" width="339.09099999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1040.53525" y="755.8500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">5. Deterministic Safety Agent (Metformin/CrCl Rules)</text>
+</g>
+<g class="node" data-id="Stage6" data-label="6. Cache &amp; Performance Agent (Flashcard Aggregator)" data-shape="rectangle">
+  <rect x="955.8902499999999" y="822.3" width="360.57999999999987" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1136.18025" y="840.75" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">6. Cache &amp; Performance Agent (Flashcard Aggregator)</text>
+</g>
+<g class="node" data-id="Stage7" data-label="7. Audit Logger (Immutable Clinical Event Trail)" data-shape="rectangle">
+  <rect x="1064.5027499999999" y="907.2" width="308.70999999999987" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1218.85775" y="925.6500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">7. Audit Logger (Immutable Clinical Event Trail)</text>
+</g>
+<g class="node" data-id="DB" data-label="SQLite Clinical Database" data-shape="cylinder">
+  <rect x="908.0409999999997" y="1071.1" width="185.70399999999998" height="36.900000000000006" fill="var(--_node-fill)" stroke="none" />
+  <line x1="908.0409999999997" y1="1071.1" x2="908.0409999999997" y2="1108" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="1093.7449999999997" y1="1071.1" x2="1093.7449999999997" y2="1108" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="1000.8929999999997" cy="1108" rx="92.85199999999999" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="1000.8929999999997" cy="1071.1" rx="92.85199999999999" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1000.8929999999997" y="1089.55" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">SQLite Clinical Database</text>
+</g>
+<g class="node" data-id="AuditStore" data-label="Immutable Audit Logs" data-shape="cylinder">
+  <rect x="1121.7449999999997" y="1071.1" width="163.474" height="36.900000000000006" fill="var(--_node-fill)" stroke="none" />
+  <line x1="1121.7449999999997" y1="1071.1" x2="1121.7449999999997" y2="1108" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="1285.2189999999996" y1="1071.1" x2="1285.2189999999996" y2="1108" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="1203.4819999999997" cy="1108" rx="81.737" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="1203.4819999999997" cy="1071.1" rx="81.737" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="1203.4819999999997" y="1089.55" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Immutable Audit Logs</text>
+</g>
+<g class="node" data-id="GeminiAPI" data-label="Gemini 2.5 Flash API (Multimodal OCR/Extract)" data-shape="rectangle">
+  <rect x="374.74879166666653" y="1229" width="306.4869999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="527.9922916666665" y="1247.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Gemini 2.5 Flash API (Multimodal OCR/Extract)</text>
+</g>
+<g class="node" data-id="RxNavAPI" data-label="RxNav / NLM REST API (RxNorm Normalized Codes)" data-shape="rectangle">
+  <rect x="709.2357916666665" y="1229" width="346.5009999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="882.4862916666665" y="1247.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">RxNav / NLM REST API (RxNorm Normalized Codes)</text>
+</g>
+</svg>

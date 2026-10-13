@@ -1,0 +1,38 @@
+# Git and VCS
+.git
+.gitignore
+.github
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# Node & Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Local data & environment
+.env
+.env.local
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/uploads/*
+!data/uploads/.gitkeep
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+scratch/

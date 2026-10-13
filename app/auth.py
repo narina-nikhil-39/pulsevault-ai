@@ -11,8 +11,9 @@ import os
 import secrets
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -33,12 +34,16 @@ class AuthenticatedDoctor:
     doctor_id: str
     display_name: str
     role: str
+    scope: Optional[str] = None
+    patient_boundary: Optional[str] = None
 
-    def as_dict(self) -> Dict[str, str]:
+    def as_dict(self) -> Dict[str, Any]:
         return {
             "doctor_id": self.doctor_id,
             "display_name": self.display_name,
             "role": self.role,
+            "scope": self.scope,
+            "patient_boundary": self.patient_boundary,
         }
 
 
@@ -82,6 +87,19 @@ DOCTORS: Dict[str, Dict[str, str]] = {
     },
 }
 
+NURSES: Dict[str, Dict[str, str]] = {
+    "RN-001": {
+        "display_name": "Nurse Sarah Jenkins",
+        "role": "charge_nurse",
+        "password_hash": hash_password("nurse1234"),
+    },
+    "RN-002": {
+        "display_name": "Nurse Priya Sharma",
+        "role": "triage_nurse",
+        "password_hash": hash_password("nurse1234"),
+    },
+}
+
 
 def authenticate(doctor_id: str, password: str) -> str:
     """Validate credentials and return a signed bearer token."""
@@ -96,7 +114,29 @@ def authenticate(doctor_id: str, password: str) -> str:
 
 
 def decode_token(token: str) -> AuthenticatedDoctor:
-    """Validate a bearer token and return the clinician identity."""
+    """Validate a bearer token (standard clinician or break-glass ephemeral) and return identity."""
+    # Support 60-minute Break-Glass Ephemeral JWT tokens
+    if token.count(".") == 2:
+        try:
+            payload = jwt.decode(token, _SECRET_KEY, algorithms=["HS256"])
+            if payload.get("token_type") == "break_glass":
+                doctor_id = payload.get("doctor_id") or payload.get("sub", "EMERGENCY_MD")
+                record = DOCTORS.get(doctor_id, {
+                    "display_name": f"Emergency Doctor ({doctor_id})",
+                    "role": "emergency_break_glass",
+                })
+                return AuthenticatedDoctor(
+                    doctor_id=doctor_id,
+                    display_name=record.get("display_name", f"Emergency Doctor ({doctor_id})"),
+                    role="emergency_break_glass",
+                    scope=payload.get("scope"),
+                    patient_boundary=payload.get("patient_code"),
+                )
+        except jwt.ExpiredSignatureError as exc:
+            raise AuthenticationError("Ephemeral emergency token has expired.") from exc
+        except jwt.InvalidTokenError as exc:
+            raise AuthenticationError(f"Invalid emergency token: {exc}") from exc
+
     parts = token.split(":")
     if len(parts) != 3:
         raise AuthenticationError("Malformed access token.")
@@ -142,3 +182,32 @@ def get_current_doctor(
             detail=str(exc),
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
+
+
+def require_scope(required_scope: str):
+    """FastAPI dependency enforcing that break-glass emergency tokens possess the required scope."""
+
+    def dependency(
+        doctor: AuthenticatedDoctor = Depends(get_current_doctor),
+    ) -> AuthenticatedDoctor:
+        if doctor.role == "emergency_break_glass":
+            if doctor.scope != required_scope:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f"Forbidden: Ephemeral emergency token does not possess scope '{required_scope}'.",
+                )
+        return doctor
+
+    return dependency
+
+
+def require_standard_clinician(
+    doctor: AuthenticatedDoctor = Depends(get_current_doctor),
+) -> AuthenticatedDoctor:
+    """FastAPI dependency blocking break-glass emergency tokens from standard non-emergency routes."""
+    if doctor.role == "emergency_break_glass":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden: Break-glass emergency tokens cannot access non-emergency clinical endpoints.",
+        )
+    return doctor

@@ -39,10 +39,20 @@ Thumbs.db
 # Archives & Temp
 *.zip
 *.tar.gz
+*.tmp
+.archify/
+archify_demo/
+archify_output/
 
-# Runtime Data & Generated Corpus
-data/*.db
-data/*.db-journal
+# Runtime Data, SQLite Databases & Generated Corpus
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+data/*.db*
+data/*.sqlite*
 data/uploads/*
 !data/uploads/.gitkeep
 data/test_uploads/*

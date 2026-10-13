@@ -6,7 +6,7 @@ frontend can render the pipeline progress the project brief calls for.
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -60,6 +60,7 @@ class PipelineOutcome:
     safety_report: Optional[Dict[str, Any]] = None
     graph_summary: Optional[Dict[str, Any]] = None
     flashcard: Optional[Dict[str, Any]] = None
+    vector_chunks_indexed: int = 0
     elapsed_ms: int = 0
 
     def as_dict(self) -> Dict[str, Any]:
@@ -70,6 +71,7 @@ class PipelineOutcome:
             "steps": [step.as_dict() for step in self.steps],
             "entities_extracted": self.persist_result.total if self.persist_result else 0,
             "normalized_count": self.persist_result.normalized if self.persist_result else 0,
+            "vector_chunks_indexed": self.vector_chunks_indexed,
             "safety_alerts": (self.safety_report or {}).get("total_findings", 0),
             "critical_alerts": (self.safety_report or {}).get("critical", 0),
             "extraction_method": self.extraction_method,
@@ -106,11 +108,17 @@ class ClinicalIngestionPipeline:
         document: SourceDocument,
         file_bytes: bytes,
         prefer_llm: bool = True,
+        step_callback: Optional[Callable[[str, str, Optional[str]], None]] = None,
     ) -> PipelineOutcome:
         """Process one uploaded document end to end."""
         started = datetime.utcnow()
         steps = [PipelineStep(key=key, label=label) for key, label in _STEP_ORDER]
         warnings: List[str] = []
+
+        def mark_step(k: str, s: str, d: Optional[str] = None):
+            _mark(steps, k, s, d)
+            if step_callback:
+                step_callback(k, s, d)
 
         ingestion = self.ingestion_agent.ingest(
             file_bytes, document.filename, document.mime_type or "application/pdf"
@@ -126,9 +134,8 @@ class ClinicalIngestionPipeline:
         document.extracted_text = recovered or ingestion.native_text
         document.processed_at = datetime.utcnow()
 
-        _mark(steps, "document_uploaded", "complete", document.filename)
-        _mark(
-            steps,
+        mark_step("document_uploaded", "complete", document.filename)
+        mark_step(
             "ocr_completed",
             "complete",
             f"{ingestion.page_count} page(s), {len(document.extracted_text or '')} characters",
@@ -141,8 +148,7 @@ class ClinicalIngestionPipeline:
             prefer_llm=prefer_llm,
         )
         warnings.extend(extraction.warnings)
-        _mark(
-            steps,
+        mark_step(
             "entities_extracted",
             "complete",
             f"{extraction.entity_count} entities via {extraction.method}",
@@ -164,32 +170,44 @@ class ClinicalIngestionPipeline:
         )
         self.patient_service.supersede_medications(db, patient)
 
-        _mark(
-            steps,
+        # Extract and index spatial chunks in Qdrant Vector Store
+        vector_chunks_indexed = 0
+        try:
+            from src.services.rag_service import rag_service
+
+            chunks = rag_service.extract_document_chunks(
+                file_bytes=file_bytes,
+                document_id=document.id,
+                patient_code=patient.patient_code,
+                document_title=document.filename,
+                extracted_text=document.extracted_text,
+            )
+            vector_chunks_indexed = rag_service.index_chunks(chunks)
+        except Exception as exc:
+            warnings.append(f"Vector indexing skipped: {exc}")
+
+        mark_step(
             "terminology_normalized",
             "complete",
-            f"{persist_result.normalized} term(s) mapped to SNOMED CT / RxNorm / ICD-10 / LOINC",
+            f"{persist_result.normalized} term(s) mapped; {vector_chunks_indexed} spatial chunk(s) indexed in Qdrant",
         )
 
         graph = self.graph_agent.build(db, patient)
-        _mark(
-            steps,
+        mark_step(
             "timeline_generated",
             "complete",
             f"{len(graph.nodes)} events, {len(graph.edges)} relationships",
         )
 
         report = self.safety_agent.evaluate(db, patient, persist=True)
-        _mark(
-            steps,
+        mark_step(
             "safety_checks_completed",
             "complete",
             f"{len(report.findings)} finding(s), {report.critical_count} critical",
         )
 
         flashcard = self.flashcard_agent.compute(db, patient)
-        _mark(
-            steps,
+        mark_step(
             "flashcard_generated",
             "complete",
             f"version {flashcard.version}, cached for sub-3s retrieval",
@@ -212,6 +230,7 @@ class ClinicalIngestionPipeline:
                 "conflicts": [conflict.as_dict() for conflict in graph.conflicts],
             },
             flashcard=flashcard.as_dict(),
+            vector_chunks_indexed=vector_chunks_indexed,
             elapsed_ms=int((datetime.utcnow() - started).total_seconds() * 1000),
         )
 
