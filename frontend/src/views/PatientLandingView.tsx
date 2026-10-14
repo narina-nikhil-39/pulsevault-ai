@@ -9,12 +9,14 @@ import {
   type PortalPatientSummary,
 } from '../api'
 import { AsyncProgressTracker } from '../components/AsyncProgressTracker'
+import { PatientRegisterWizard } from '../components/PatientRegisterWizard'
 
 
 interface PatientLandingViewProps {
-  onSwitchPersona: (persona: 'reception' | 'doctor' | 'patient') => void
-  persona: 'reception' | 'doctor' | 'patient'
+  onSwitchPersona?: (persona: 'reception' | 'doctor' | 'patient') => void
+  persona?: 'reception' | 'doctor' | 'patient'
   onBookAppointmentRedirect?: () => void
+  onNavigateHome?: () => void
 }
 
 interface ChatMessage {
@@ -33,14 +35,16 @@ interface TriageResult {
 
 export function PatientLandingView({
   onSwitchPersona,
-  persona,
+  persona: _persona = 'patient',
   onBookAppointmentRedirect,
+  onNavigateHome,
 }: PatientLandingViewProps) {
   const [patients, setPatients] = useState<PortalPatientSummary[]>([])
   const [selectedCode, setSelectedCode] = useState<string>('SYN123456')
   const [profile, setProfile] = useState<PatientProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'locker' | 'voice' | 'triage'>('locker')
+  const [showRegisterWizard, setShowRegisterWizard] = useState(false)
 
   // Document Upload State
   const [uploading, setUploading] = useState(false)
@@ -399,40 +403,23 @@ export function PatientLandingView({
             </div>
           </div>
 
-          {/* Center Persona Switcher Pill */}
-          <div className="flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200 shadow-inner">
+          {/* Decoupled Hospital Navigation */}
+          <div className="flex items-center gap-2.5">
+            {onNavigateHome && (
+              <button
+                onClick={onNavigateHome}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 transition"
+              >
+                <span>←</span>
+                <span>Hospital Directory</span>
+              </button>
+            )}
             <button
-              onClick={() => onSwitchPersona('reception')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                persona === 'reception'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+              onClick={() => setShowRegisterWizard(true)}
+              className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition"
             >
-              <span>🏨</span>
-              <span>Reception Desk</span>
-            </button>
-            <button
-              onClick={() => onSwitchPersona('doctor')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                persona === 'doctor'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <span>🩺</span>
-              <span>Doctor Console</span>
-            </button>
-            <button
-              onClick={() => onSwitchPersona('patient')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                persona === 'patient'
-                  ? 'bg-emerald-500 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <span>👤</span>
-              <span>Patient Portal</span>
+              <span>+</span>
+              <span>Register New Patient</span>
             </button>
           </div>
 
@@ -449,7 +436,7 @@ export function PatientLandingView({
               onClick={() => {
                 if (onBookAppointmentRedirect) {
                   onBookAppointmentRedirect()
-                } else {
+                } else if (onSwitchPersona) {
                   onSwitchPersona('reception')
                 }
               }}
@@ -514,7 +501,13 @@ export function PatientLandingView({
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
-                onClick={() => onSwitchPersona('reception')}
+                onClick={() => {
+                  if (onBookAppointmentRedirect) {
+                    onBookAppointmentRedirect()
+                  } else if (onSwitchPersona) {
+                    onSwitchPersona('reception')
+                  }
+                }}
                 className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-6 py-3 text-xs font-bold text-white shadow-md shadow-emerald-500/25 transition"
               >
                 Book an Appointment
@@ -993,6 +986,28 @@ export function PatientLandingView({
         <span>MediCare Pro &amp; SynapseHealth · Certified HL7 FHIR Exchange</span>
         <span>ABDM &amp; HIPAA Compliant Patient Portal</span>
       </footer>
+
+      {/* Patient Registration Wizard Modal */}
+      {showRegisterWizard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <PatientRegisterWizard
+            onClose={() => setShowRegisterWizard(false)}
+            onSuccess={(code) => {
+              setSelectedCode(code)
+              fetchPortalPatients().then(setPatients).catch(console.error)
+            }}
+            onOpenPatientPortal={(code) => {
+              setSelectedCode(code)
+              setShowRegisterWizard(false)
+              fetchPortalPatients().then(setPatients).catch(console.error)
+            }}
+            onOpenDoctorConsole={(_code) => {
+              setShowRegisterWizard(false)
+              if (onSwitchPersona) onSwitchPersona('doctor')
+            }}
+          />
+        </div>
+      )}
     </div>
   )
 }

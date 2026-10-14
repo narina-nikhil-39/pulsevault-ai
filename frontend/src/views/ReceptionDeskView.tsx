@@ -3,15 +3,20 @@ import {
   fetchReceptionQueue,
   checkinReceptionQueue,
   searchPatientDatabase,
+  fetchDoctors,
   type AppointmentItem,
+  type DoctorItem,
 } from '../api'
 import { QRCameraScanner } from '../components/QRCameraScanner'
+import { PatientRegisterWizard } from '../components/PatientRegisterWizard'
 
 
 interface ReceptionDeskViewProps {
-  onSwitchPersona: (persona: 'reception' | 'doctor' | 'patient') => void
-  persona: 'reception' | 'doctor' | 'patient'
+  onSwitchPersona?: (persona: 'reception' | 'doctor' | 'patient') => void
+  persona?: 'reception' | 'doctor' | 'patient'
   onSelectPatientForDoctor?: (patientCode: string) => void
+  onNavigateHome?: () => void
+  onOpenPatientPortal?: (patientCode?: string) => void
 }
 
 type DeskTab = 'search' | 'details' | 'confirmed' | 'queue'
@@ -19,8 +24,10 @@ type QueueFilter = 'all' | 'checked_in' | 'waiting' | 'consulted' | 'cancelled'
 
 export function ReceptionDeskView({
   onSwitchPersona,
-  persona,
+  persona: _persona = 'reception',
   onSelectPatientForDoctor,
+  onNavigateHome,
+  onOpenPatientPortal,
 }: ReceptionDeskViewProps) {
   const [activeStep, setActiveStep] = useState<DeskTab>('search')
   const [sidebarItem, setSidebarItem] = useState<'register' | 'appointments' | 'records' | 'print'>(
@@ -31,8 +38,10 @@ export function ReceptionDeskView({
   const [queueFilter, setQueueFilter] = useState<QueueFilter>('all')
   const [queueSearch, setQueueSearch] = useState('')
   const [showSlipModal, setShowSlipModal] = useState(false)
+  const [showRegisterWizard, setShowRegisterWizard] = useState(false)
 
-  // Booking Form State
+  // Booking Form State & Dynamic Doctors
+  const [doctorsList, setDoctorsList] = useState<DoctorItem[]>([])
   const [selectedDept, setSelectedDept] = useState('General Medicine')
   const [selectedDoc, setSelectedDoc] = useState('Dr. Meera Thomas')
   const [selectedDate, setSelectedDate] = useState('12 Aug 2026')
@@ -59,6 +68,14 @@ export function ReceptionDeskView({
 
   useEffect(() => {
     loadLiveQueue()
+    fetchDoctors()
+      .then((docs) => {
+        if (docs && docs.length > 0 && docs[0]) {
+          setDoctorsList(docs)
+          setSelectedDoc(docs[0].name)
+        }
+      })
+      .catch((err) => console.error('Failed to load doctors list:', err))
   }, [])
 
   async function loadLiveQueue() {
@@ -275,40 +292,23 @@ export function ReceptionDeskView({
             <span className="text-xs font-bold text-slate-700">Patient Intake &amp; Triage</span>
           </div>
 
-          {/* Persona Switcher Pill */}
-          <div className="flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200 shadow-inner">
+          {/* Decoupled Hospital Navigation */}
+          <div className="flex items-center gap-2.5">
+            {onNavigateHome && (
+              <button
+                onClick={onNavigateHome}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 transition"
+              >
+                <span>←</span>
+                <span>Hospital Directory</span>
+              </button>
+            )}
             <button
-              onClick={() => onSwitchPersona('reception')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                persona === 'reception'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+              onClick={() => setShowRegisterWizard(true)}
+              className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-blue-700 transition"
             >
-              <span>🏨</span>
-              <span>Reception Desk</span>
-            </button>
-            <button
-              onClick={() => onSwitchPersona('doctor')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                persona === 'doctor'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <span>🩺</span>
-              <span>Doctor Console</span>
-            </button>
-            <button
-              onClick={() => onSwitchPersona('patient')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                persona === 'patient'
-                  ? 'bg-emerald-500 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <span>👤</span>
-              <span>Patient Portal</span>
+              <span>+</span>
+              <span>New Patient Intake</span>
             </button>
           </div>
 
@@ -541,10 +541,7 @@ export function ReceptionDeskView({
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearchId('NEW-PATIENT')
-                    setActiveStep('details')
-                  }}
+                  onClick={() => setShowRegisterWizard(true)}
                   className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
                 >
                   Create New Patient
@@ -597,7 +594,7 @@ export function ReceptionDeskView({
                       <button
                         onClick={() => {
                           onSelectPatientForDoctor(patientData.code)
-                          onSwitchPersona('doctor')
+                          if (onSwitchPersona) onSwitchPersona('doctor')
                         }}
                         className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
                       >
@@ -636,7 +633,7 @@ export function ReceptionDeskView({
                         if (onSelectPatientForDoctor) {
                           onSelectPatientForDoctor(patientData.code)
                         }
-                        onSwitchPersona('doctor')
+                        if (onSwitchPersona) onSwitchPersona('doctor')
                       }}
                       className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1"
                     >
@@ -738,10 +735,20 @@ export function ReceptionDeskView({
                       onChange={(e) => setSelectedDoc(e.target.value)}
                       className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 focus:border-blue-600 focus:outline-none"
                     >
-                      <option value="Dr. Priya Mehta">Dr. Priya Mehta</option>
-                      <option value="Dr. Meera Thomas">Dr. Meera Thomas</option>
-                      <option value="Dr. Vikram Menon">Dr. Vikram Menon</option>
-                      <option value="Dr. Rohit Kumar">Dr. Rohit Kumar</option>
+                      {doctorsList.length > 0 ? (
+                        doctorsList.map((doc) => (
+                          <option key={doc.doctor_id} value={doc.name}>
+                            {doc.name} ({doc.specialization})
+                          </option>
+                        ))
+                      ) : (
+                        <>
+                          <option value="Dr. Priya Mehta">Dr. Priya Mehta</option>
+                          <option value="Dr. Meera Thomas">Dr. Meera Thomas</option>
+                          <option value="Dr. Vikram Menon">Dr. Vikram Menon</option>
+                          <option value="Dr. Rohit Kumar">Dr. Rohit Kumar</option>
+                        </>
+                      )}
                     </select>
                   </div>
 
@@ -1105,6 +1112,31 @@ export function ReceptionDeskView({
           </div>
         </div>
       ) : null}
+
+      {/* Patient Registration Wizard Modal */}
+      {showRegisterWizard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <PatientRegisterWizard
+            onClose={() => setShowRegisterWizard(false)}
+            onSuccess={(code) => {
+              void performPatientLookup(code)
+            }}
+            onOpenDoctorConsole={(code) => {
+              setShowRegisterWizard(false)
+              if (onSelectPatientForDoctor) onSelectPatientForDoctor(code)
+              if (onSwitchPersona) onSwitchPersona('doctor')
+            }}
+            onOpenPatientPortal={(code) => {
+              setShowRegisterWizard(false)
+              if (onOpenPatientPortal) {
+                onOpenPatientPortal(code)
+              } else if (onSwitchPersona) {
+                onSwitchPersona('patient')
+              }
+            }}
+          />
+        </div>
+      )}
     </div>
   )
 }

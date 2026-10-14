@@ -58,12 +58,14 @@ from app.schemas import (
     AuditEventOut,
     BreakGlassRequest,
     BreakGlassResponse,
+    DoctorOut,
     GraphCypherResponse,
     GraphSubgraphResponse,
     GraphSyncResponse,
     JobStatusOut,
     LoginRequest,
     LoginResponse,
+    PatientRegistrationResponse,
     PatientSearchResult,
     PatientSummary,
     PipelineResult,
@@ -80,6 +82,7 @@ from src.db.models import (
     Allergy,
     Appointment,
     Condition,
+    Doctor,
     Medication,
     Patient,
     SafetyAlert,
@@ -104,8 +107,11 @@ async def lifespan(_: FastAPI):
     if not is_testing:
         try:
             from scripts.seed_demo_patients import seed_demo_patients
+            from scripts.seed_doctors import seed_doctors
             db = SessionLocal()
             try:
+                if not db.scalar(select(Doctor).limit(1)):
+                    seed_doctors(db)
                 if not db.scalar(select(Patient).where(Patient.patient_code == "OPD-ARJUN")):
                     seed_demo_patients(db)
             finally:
@@ -1210,6 +1216,220 @@ def search_patients_dynamic(
             )
         )
     return results
+
+
+@app.get(
+    "/api/doctors",
+    response_model=List[DoctorOut],
+    status_code=status.HTTP_200_OK,
+)
+def list_doctors(db: Session = Depends(get_db)) -> List[DoctorOut]:
+    """Retrieve all credentialed active hospital doctors across departments."""
+    doctors = db.scalars(
+        select(Doctor).where(Doctor.active_status == True).order_by(Doctor.name)
+    ).all()
+    return [
+        DoctorOut(
+            id=d.id,
+            doctor_id=d.doctor_id,
+            name=d.name,
+            specialization=d.specialization,
+            qualifications=d.qualifications,
+            reg_number=d.reg_number,
+            hospital_name=d.hospital_name,
+            avatar_url=d.avatar_url,
+            active_status=d.active_status,
+        )
+        for d in doctors
+    ]
+
+
+@app.get(
+    "/api/doctors/{doctor_identifier}",
+    response_model=DoctorOut,
+    status_code=status.HTTP_200_OK,
+)
+def get_doctor(doctor_identifier: str, db: Session = Depends(get_db)) -> DoctorOut:
+    """Retrieve a doctor profile by database primary key or doctor identifier (e.g., DOC-HYD-4012)."""
+    doctor = None
+    if doctor_identifier.isdigit():
+        doctor = db.get(Doctor, int(doctor_identifier))
+    if not doctor:
+        doctor = db.scalar(select(Doctor).where(Doctor.doctor_id == doctor_identifier))
+    if not doctor:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Doctor '{doctor_identifier}' not found in hospital registry.",
+        )
+    return DoctorOut(
+        id=doctor.id,
+        doctor_id=doctor.doctor_id,
+        name=doctor.name,
+        specialization=doctor.specialization,
+        qualifications=doctor.qualifications,
+        reg_number=doctor.reg_number,
+        hospital_name=doctor.hospital_name,
+        avatar_url=doctor.avatar_url,
+        active_status=doctor.active_status,
+    )
+
+
+@app.post(
+    "/api/portal/register",
+    response_model=PatientRegistrationResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def register_patient_portal(
+    background_tasks: BackgroundTasks,
+    full_name: str = Form(..., description="Full legal name of the patient."),
+    dob: Optional[str] = Form(None, description="Date of birth in YYYY-MM-DD or partial format."),
+    age: Optional[int] = Form(None, description="Age in years if known."),
+    gender: Optional[str] = Form(None, description="Biological sex / gender."),
+    blood_group: Optional[str] = Form(None, description="Blood group (e.g. A+, O-, B+)."),
+    phone: Optional[str] = Form(None, description="Primary contact phone number."),
+    emergency_contact_name: Optional[str] = Form(None, description="Emergency contact person name."),
+    emergency_contact_phone: Optional[str] = Form(None, description="Emergency contact phone number."),
+    file: Optional[UploadFile] = File(None, description="Optional previous medical record or discharge summary."),
+    db: Session = Depends(get_db),
+) -> PatientRegistrationResponse:
+    """Register a new patient into the hospital registry and optionally trigger background record ingestion."""
+    import random
+    from datetime import date
+
+    clean_name = full_name.strip()
+    if not clean_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Patient full name is required.",
+        )
+
+    # Compute age from DOB if age not explicitly provided
+    resolved_age = age
+    if resolved_age is None and dob:
+        try:
+            parts = [int(p) for p in dob.split("-") if p.isdigit()]
+            if parts and parts[0] > 1900:
+                resolved_age = max(0, date.today().year - parts[0])
+        except Exception:
+            pass
+
+    # Generate unique patient_code: SYN-XXXXXX
+    patient_code = ""
+    for _ in range(10):
+        candidate = f"SYN-{random.randint(100000, 999999)}"
+        if not db.scalar(select(Patient).where(Patient.patient_code == candidate)):
+            patient_code = candidate
+            break
+    if not patient_code:
+        patient_code = f"SYN-{int(datetime.now().timestamp()) % 1000000:06d}"
+
+    # Build formatted emergency contact
+    formatted_emergency = None
+    if emergency_contact_name and emergency_contact_phone:
+        formatted_emergency = f"{emergency_contact_name.strip()} ({emergency_contact_phone.strip()})"
+    elif emergency_contact_name:
+        formatted_emergency = emergency_contact_name.strip()
+    elif emergency_contact_phone:
+        formatted_emergency = emergency_contact_phone.strip()
+
+    patient = Patient(
+        patient_code=patient_code,
+        full_name=clean_name,
+        age=resolved_age,
+        sex=gender.strip() if gender else None,
+        blood_group=blood_group.strip() if blood_group else None,
+        contact=phone.strip() if phone else None,
+        emergency_contact=formatted_emergency,
+    )
+    db.add(patient)
+    db.flush()
+
+    audit_logger.record(
+        db,
+        actor="portal.registration",
+        action="patient.registered",
+        resource_type="patient",
+        resource_id=patient.patient_code,
+        detail={
+            "patient_code": patient.patient_code,
+            "full_name": patient.full_name,
+            "blood_group": patient.blood_group,
+        },
+    )
+
+    job_id: Optional[str] = None
+    doc_id: Optional[int] = None
+
+    if file and file.filename:
+        filename = file.filename
+        suffix = f".{filename.rsplit('.', 1)[-1].lower()}" if "." in filename else ""
+        if suffix not in _ALLOWED_SUFFIXES:
+            raise HTTPException(
+                status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+                detail=f"Unsupported file type '{suffix or filename}'. Upload a PDF, PNG, JPEG, TIFF, or WEBP.",
+            )
+        file_bytes = file.file.read()
+        if file_bytes:
+            if len(file_bytes) > _MAX_UPLOAD_BYTES:
+                raise HTTPException(
+                    status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                    detail=f"File exceeds the {_MAX_UPLOAD_BYTES // (1024 * 1024)} MB prototype limit.",
+                )
+            document = SourceDocument(
+                patient_id=patient.id,
+                filename=filename,
+                mime_type=file.content_type,
+                size_bytes=len(file_bytes),
+                sha256=sha256_of(file_bytes),
+            )
+            db.add(document)
+            db.flush()
+
+            doc_id = document.id
+            safe_filename = Path(filename).name
+            (get_upload_dir() / f"{document.id}_{safe_filename}").write_bytes(file_bytes)
+
+            audit_logger.record(
+                db,
+                actor="portal.registration",
+                action="record.uploaded_async",
+                resource_type="source_document",
+                resource_id=patient.patient_code,
+                detail={"document_id": document.id, "filename": filename, "sha256": document.sha256},
+            )
+
+            job = job_manager.create_job(
+                patient_code=patient.patient_code,
+                patient_name=patient.full_name,
+                filename=filename,
+                document_id=document.id,
+            )
+            job_id = job.job_id
+
+            background_tasks.add_task(
+                _run_ingestion_background,
+                job.job_id,
+                patient.id,
+                document.id,
+                file_bytes,
+                "portal.registration",
+                "record.processed",
+            )
+
+    db.commit()
+
+    return PatientRegistrationResponse(
+        patient_code=patient.patient_code,
+        full_name=patient.full_name,
+        age=patient.age,
+        sex=patient.sex,
+        blood_group=patient.blood_group,
+        contact=patient.contact,
+        emergency_contact=patient.emergency_contact,
+        job_id=job_id,
+        document_id=doc_id,
+        message="Patient successfully registered.",
+    )
 
 
 if __name__ == "__main__":

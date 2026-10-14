@@ -19,9 +19,13 @@ load_dotenv()
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
-def _resolve_database_url() -> str:
-    """Return the configured database URL, coerced to an absolute SQLite path."""
-    raw = os.getenv("DATABASE_URL", "sqlite:///./data/synapsehealth.db")
+def _resolve_database_url(url: Optional[str] = None) -> str:
+    """Return the configured database URL, normalized for SQLAlchemy 2.0 and absolute SQLite paths."""
+    raw = url or os.getenv("DATABASE_URL", "sqlite:///./data/synapsehealth.db")
+
+    # Cloud PostgreSQL normalization (e.g. Neon, Supabase, Heroku postgres:// -> postgresql://)
+    if raw.startswith("postgres://"):
+        raw = "postgresql://" + raw[len("postgres://") :]
 
     if not raw.startswith("sqlite:///"):
         return raw
@@ -40,19 +44,14 @@ def _resolve_database_url() -> str:
 
 DATABASE_URL = _resolve_database_url()
 
-connect_args = (
-    {"check_same_thread": False, "timeout": 30.0}
-    if DATABASE_URL.startswith("sqlite")
-    else {}
-)
-
-engine = create_engine(
-    DATABASE_URL,
-    connect_args=connect_args,
-    future=True,
-)
-
 if DATABASE_URL.startswith("sqlite"):
+    connect_args = {"check_same_thread": False, "timeout": 30.0}
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args=connect_args,
+        future=True,
+    )
+
     from sqlalchemy import event
 
     @event.listens_for(engine, "connect")
@@ -64,6 +63,17 @@ if DATABASE_URL.startswith("sqlite"):
             cursor.execute("PRAGMA synchronous=NORMAL;")
         finally:
             cursor.close()
+
+else:
+    # Production Managed Cloud PostgreSQL (Neon / Supabase / AWS RDS / Docker)
+    engine = create_engine(
+        DATABASE_URL,
+        pool_size=10,
+        max_overflow=20,
+        pool_pre_ping=True,
+        pool_recycle=300,
+        future=True,
+    )
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
 

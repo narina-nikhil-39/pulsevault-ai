@@ -301,3 +301,32 @@ class RagQueryResponse(BaseModel):
     results_count: int
     chunks: List[RagChunkOut]
     backend: str
+
+
+class DoctorOut(BaseModel):
+    """A credentialed clinician practicing in the hospital network."""
+
+    id: int
+    doctor_id: str
+    name: str
+    specialization: str
+    qualifications: str
+    reg_number: str
+    hospital_name: str
+    avatar_url: Optional[str] = None
+    active_status: bool = True
+
+
+class PatientRegistrationResponse(BaseModel):
+    """Result of organic patient onboarding / registration flow."""
+
+    patient_code: str
+    full_name: str
+    age: Optional[int] = None
+    sex: Optional[str] = None
+    blood_group: Optional[str] = None
+    contact: Optional[str] = None
+    emergency_contact: Optional[str] = None
+    job_id: Optional[str] = None
+    document_id: Optional[int] = None
+    message: str

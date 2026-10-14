@@ -285,3 +285,20 @@ class Appointment(Base):
     status: Mapped[str] = mapped_column(String(32), default="waiting", index=True)  # waiting, checked_in, in_consultation, consulted, cancelled
     chief_complaint: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class Doctor(Base):
+    """A credentialed clinician practicing in the hospital network."""
+
+    __tablename__ = "doctors"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    doctor_id: Mapped[str] = mapped_column(String(32), unique=True, index=True)  # e.g. DOC-HYD-4012, DR-001
+    name: Mapped[str] = mapped_column(String(128), index=True)
+    specialization: Mapped[str] = mapped_column(String(128), index=True)
+    qualifications: Mapped[str] = mapped_column(String(128))
+    reg_number: Mapped[str] = mapped_column(String(64), unique=True, index=True)  # NMC/State Council Reg #
+    hospital_name: Mapped[str] = mapped_column(String(128), default="Apollo Health City, Jubilee Hills")
+    avatar_url: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    active_status: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

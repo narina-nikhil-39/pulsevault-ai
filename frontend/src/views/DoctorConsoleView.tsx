@@ -29,8 +29,9 @@ interface DoctorConsoleViewProps {
   loading: boolean
   onSelectPatient: (code: string) => void
   onSignOut: () => void
-  persona: 'reception' | 'doctor' | 'patient'
-  onSwitchPersona: (persona: 'reception' | 'doctor' | 'patient') => void
+  persona?: 'reception' | 'doctor' | 'patient'
+  onSwitchPersona?: (persona: 'reception' | 'doctor' | 'patient') => void
+  onNavigateHome?: () => void
 }
 
 type DoctorSidebarNav =
@@ -63,8 +64,9 @@ export function DoctorConsoleView({
   loading,
   onSelectPatient,
   onSignOut,
-  persona,
-  onSwitchPersona,
+  persona: _persona = 'doctor',
+  onSwitchPersona: _onSwitchPersona,
+  onNavigateHome,
 }: DoctorConsoleViewProps) {
   const [sidebarNav, setSidebarNav] = useState<DoctorSidebarNav>('dashboard')
   const [clinicalTab, setClinicalTab] = useState<ClinicalTab>('profile')
@@ -323,41 +325,23 @@ export function DoctorConsoleView({
             <span className="text-xs font-bold text-slate-700">Outpatient Consultation Console</span>
           </div>
 
-          {/* Persona Switcher Pill */}
-          <div className="flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200 shadow-inner">
-            <button
-              onClick={() => onSwitchPersona('reception')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                persona === 'reception'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <span>🏨</span>
-              <span>Reception Desk</span>
-            </button>
-            <button
-              onClick={() => onSwitchPersona('doctor')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                persona === 'doctor'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <span>🩺</span>
-              <span>Doctor Console</span>
-            </button>
-            <button
-              onClick={() => onSwitchPersona('patient')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                persona === 'patient'
-                  ? 'bg-emerald-500 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <span>👤</span>
-              <span>Patient Portal</span>
-            </button>
+          {/* Decoupled Hospital Navigation */}
+          <div className="flex items-center gap-2.5">
+            {onNavigateHome && (
+              <button
+                onClick={onNavigateHome}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 transition"
+              >
+                <span>←</span>
+                <span>Hospital Directory</span>
+              </button>
+            )}
+            {breakGlassActive ? (
+              <span className="flex items-center gap-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 px-3 py-1 text-xs font-bold text-amber-700 animate-pulse">
+                <span>⚡</span>
+                <span>Break-Glass Active ({formatCountdown(countdownSeconds)})</span>
+              </span>
+            ) : null}
           </div>
 
           {/* Right Doctor Pill & Notifications */}

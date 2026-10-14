@@ -30,6 +30,7 @@ from src.db.models import (
     Allergy,
     Appointment,
     Condition,
+    Doctor,
     EmergencyFlashcard,
     Implant,
     LabValue,
@@ -38,6 +39,7 @@ from src.db.models import (
     SafetyAlert,
     SourceDocument,
 )
+from scripts.seed_doctors import seed_doctors
 
 
 def _generate_simple_pdf(filepath: Path, title: str, lines: List[str]) -> bytes:
@@ -755,6 +757,9 @@ def seed_demo_patients(db: Optional[Session] = None) -> Dict[str, str]:
         ]
         session.add_all(demo_appointments)
 
+        # Seed realistic credentialed doctors across specialties
+        seeded_docs = seed_doctors(session)
+
         session.commit()
         return {
             "status": "success",
@@ -762,6 +767,7 @@ def seed_demo_patients(db: Optional[Session] = None) -> Dict[str, str]:
             "patient_2": f"{p2.full_name} ({p2.patient_code}) seeded for OPD Warfarin+NSAID demo",
             "patient_3": f"{p3.full_name} ({p3.patient_code}) seeded for Desk & Doctor console demo",
             "appointments": f"{len(demo_appointments)} clinic queue appointments seeded",
+            "doctors": f"{len(seeded_docs)} credentialed hospital doctors seeded",
         }
     except Exception:
         session.rollback()

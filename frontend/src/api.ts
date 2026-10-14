@@ -746,3 +746,71 @@ export function queryPatientRag(
     json: { query, top_k: topK },
   })
 }
+
+// =============================================================================
+// Realistic Doctor Profiles & Organic Patient Intake
+// =============================================================================
+
+export interface DoctorItem {
+  id: number
+  doctor_id: string
+  name: string
+  specialization: string
+  qualifications: string
+  reg_number: string
+  hospital_name: string
+  avatar_url?: string | null
+  active_status: boolean
+}
+
+export interface PatientRegistrationPayload {
+  full_name: string
+  dob?: string
+  age?: number
+  gender?: string
+  blood_group?: string
+  phone?: string
+  emergency_contact_name?: string
+  emergency_contact_phone?: string
+  file?: File | null
+}
+
+export interface PatientRegistrationResponse {
+  patient_code: string
+  full_name: string
+  age: number | null
+  sex: string | null
+  blood_group: string | null
+  contact: string | null
+  emergency_contact: string | null
+  job_id: string | null
+  document_id: number | null
+  message: string
+}
+
+export function fetchDoctors(): Promise<DoctorItem[]> {
+  return request<DoctorItem[]>('/doctors', { auth: false })
+}
+
+export function fetchDoctor(doctorId: string | number): Promise<DoctorItem> {
+  return request<DoctorItem>(`/doctors/${encodeURIComponent(String(doctorId))}`, { auth: false })
+}
+
+export function registerPatient(payload: PatientRegistrationPayload): Promise<PatientRegistrationResponse> {
+  const form = new FormData()
+  form.append('full_name', payload.full_name)
+  if (payload.dob) form.append('dob', payload.dob)
+  if (payload.age !== undefined && payload.age !== null) form.append('age', String(payload.age))
+  if (payload.gender) form.append('gender', payload.gender)
+  if (payload.blood_group) form.append('blood_group', payload.blood_group)
+  if (payload.phone) form.append('phone', payload.phone)
+  if (payload.emergency_contact_name) form.append('emergency_contact_name', payload.emergency_contact_name)
+  if (payload.emergency_contact_phone) form.append('emergency_contact_phone', payload.emergency_contact_phone)
+  if (payload.file) form.append('file', payload.file)
+
+  return request<PatientRegistrationResponse>('/portal/register', {
+    method: 'POST',
+    body: form,
+    auth: false,
+  })
+}
