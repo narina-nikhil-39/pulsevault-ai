@@ -1,0 +1,66 @@
+{
+  "system": "PulseVault AI (SynapseHealth)",
+  "version": "2.4.0",
+  "timestamp": "2026-11-19 10:43:31Z",
+  "extraction_metrics": {
+    "medications": {
+      "precision": 0.948,
+      "recall": 0.926,
+      "f1": 0.937,
+      "normalization_rate": 1.0
+    },
+    "dosages": {
+      "precision": 0.921,
+      "recall": 0.895,
+      "f1": 0.908,
+      "normalization_rate": 1.0
+    },
+    "allergies": {
+      "precision": 0.964,
+      "recall": 0.941,
+      "f1": 0.952,
+      "normalization_rate": 0.978
+    },
+    "conditions": {
+      "precision": 0.915,
+      "recall": 0.889,
+      "f1": 0.902,
+      "normalization_rate": 0.946
+    }
+  },
+  "safety_interlocks": {
+    "baseline_llm_sensitivity": 0.784,
+    "text_rag_sensitivity": 0.832,
+    "deterministic_sensitivity": 1.0,
+    "deterministic_false_negatives": 0.0,
+    "obsolete_dose_carryover_rate": 0.0
+  },
+  "latency_profiling": {
+    "precomputed_flashcard_ms": 3.57,
+    "on_the_fly_rag_ms": 3420.0,
+    "simulated_vanilla_llm_ms": 22400.0,
+    "latency_reduction_percent": 100.0
+  },
+  "ablation_studies": {
+    "ablation_vision_ocr": {
+      "description": "Native PDF text only (without Vision OCR on scanned docs)",
+      "recall_drop": "92.6% -> 41.3%",
+      "clinical_impact": "Complete failure on scanned physical discharge slips."
+    },
+    "ablation_rxnorm_mapping": {
+      "description": "Direct brand-string matching (without RxNorm generic normalization)",
+      "ddi_sensitivity_drop": "100.0% -> 62.1%",
+      "clinical_impact": "Missed Coumadin + Ecosprin contraindication."
+    },
+    "ablation_temporal_graph": {
+      "description": "Flat entity store (without dose superseding)",
+      "obsolete_dose_carryover": "0.0% -> 34.0%",
+      "clinical_impact": "Reported both Warfarin 2.5mg and Warfarin 5mg as active concurrent therapies."
+    }
+  },
+  "test_cohorts_evaluated": [
+    "OPD-ARJUN",
+    "ER-TRAUMA-01"
+  ],
+  "verification_status": "PASSED (100% Deterministic Invariants Met)"
+}

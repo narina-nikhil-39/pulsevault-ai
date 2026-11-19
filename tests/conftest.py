@@ -16,11 +16,16 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 # so the developer's real data/synapsehealth.db is never touched by a test.
 _TEST_DB = _PROJECT_ROOT / "data" / "test_synapsehealth.db"
 _TEST_DB.parent.mkdir(parents=True, exist_ok=True)
-_TEST_DB.unlink(missing_ok=True)
+try:
+    _TEST_DB.unlink(missing_ok=True)
+except Exception:
+    pass
 os.environ["DATABASE_URL"] = f"sqlite:///{_TEST_DB.as_posix()}"
 os.environ["UPLOAD_DIR"] = str(_PROJECT_ROOT / "data" / "test_uploads")
 # Force the deterministic lexicon path so the suite does not depend on a live API key.
 os.environ["GEMINI_API_KEY"] = ""
+os.environ["QDRANT_IN_MEMORY"] = "1"
+os.environ["NEO4J_URI"] = ""
 
 from src.db.database import Base, SessionLocal, engine, init_db  # noqa: E402
 

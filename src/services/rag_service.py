@@ -42,7 +42,13 @@ class QdrantRagService:
         self.backend = "uninitialized"
         self.client: QdrantClient = None  # type: ignore
 
-        if force_memory:
+        is_test = bool(
+            force_memory
+            or os.getenv("QDRANT_IN_MEMORY", "0").lower() in ("1", "true", "yes")
+            or "PYTEST_CURRENT_TEST" in os.environ
+            or "test" in os.getenv("DATABASE_URL", "").lower()
+        )
+        if is_test:
             self._init_memory_client()
         else:
             self._init_client()
