@@ -581,6 +581,11 @@ export function PatientRegisterWizard({
                 <div className="mt-2 inline-block rounded-xl bg-white border border-emerald-300 px-4 py-2 font-mono text-lg font-bold text-blue-700 shadow-xs">
                   {registrationResult.patient_code}
                 </div>
+                <div className="mt-2 text-xs font-semibold text-slate-600 flex items-center justify-center gap-2">
+                  <span>🔑 Default 4-Digit Locker PIN:</span>
+                  <span className="font-mono font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded border border-amber-300">1234</span>
+                  <span className="text-[11px] text-slate-400 font-normal">(or last 4 digits of phone)</span>
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2 text-xs pt-2 border-t border-emerald-200/60 max-w-md mx-auto text-slate-700">

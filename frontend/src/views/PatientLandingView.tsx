@@ -85,6 +85,8 @@ export function PatientLandingView({
   const [authTab, setAuthTab] = useState<'pin' | 'otp'>('pin')
   const [loginCode, setLoginCode] = useState('OPD-ARJUN')
   const [loginPin, setLoginPin] = useState('1234')
+  const [showPin, setShowPin] = useState(false)
+  const [showSwitchPin, setShowSwitchPin] = useState(false)
   const [otpContact, setOtpContact] = useState('')
   const [candidateOtp, setCandidateOtp] = useState('')
   const [otpResponse, setOtpResponse] = useState<PatientOtpResponse | null>(null)
@@ -1245,31 +1247,61 @@ export function PatientLandingView({
               {authTab === 'pin' && (
                 <form onSubmit={handlePinLogin} className="space-y-4 text-xs">
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1.5">ABHA ID or Patient Code</label>
+                    <label className="block font-bold text-slate-700 mb-1.5">
+                      ABHA ID, Patient Code, or Registered Mobile
+                    </label>
                     <input
                       type="text"
                       required
                       value={loginCode}
-                      onChange={(e) => setLoginCode(e.target.value.toUpperCase())}
-                      placeholder="e.g. OPD-ARJUN or SYN123456"
+                      onChange={(e) => setLoginCode(e.target.value)}
+                      placeholder="e.g. OPD-ARJUN, SYN123456, or 9876543210"
                       className="w-full rounded-xl border border-slate-300 p-3 font-mono font-bold text-slate-900 focus:border-emerald-600 focus:outline-none uppercase"
                     />
+                    <span className="text-[11px] text-slate-400 mt-1 block">
+                      Tip: You can enter Patient Code (OPD-ARJUN), ABHA ID (SYN123456), or your Phone Number.
+                    </span>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <label className="font-bold text-slate-700">4-Digit Security PIN</label>
-                      <span className="text-[11px] text-slate-400 font-mono">Demo PIN: 1234</span>
+                      <div className="flex items-center gap-2">
+                        <label className="font-bold text-slate-700">4-Digit Security PIN</label>
+                        <button
+                          type="button"
+                          onClick={() => setLoginPin('1234')}
+                          className="text-[10px] font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 px-2 py-0.5 rounded-md transition cursor-pointer"
+                          title="Auto-fill master demo PIN 1234"
+                        >
+                          🔑 Fill 1234
+                        </button>
+                      </div>
+                      <span className="text-[11px] text-slate-500 font-mono">
+                        Demo PIN: <strong className="text-emerald-700">1234</strong>
+                      </span>
                     </div>
-                    <input
-                      type="password"
-                      maxLength={6}
-                      required
-                      value={loginPin}
-                      onChange={(e) => setLoginPin(e.target.value)}
-                      placeholder="••••"
-                      className="w-full rounded-xl border border-slate-300 p-3 font-mono text-center tracking-[0.5em] text-lg font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showPin ? 'text' : 'password'}
+                        maxLength={6}
+                        required
+                        value={loginPin}
+                        onChange={(e) => setLoginPin(e.target.value)}
+                        placeholder="••••"
+                        className="w-full rounded-xl border border-slate-300 p-3 font-mono text-center tracking-[0.5em] text-lg font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPin(!showPin)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer"
+                        title={showPin ? 'Hide PIN' : 'Show PIN'}
+                      >
+                        {showPin ? '👁️' : '🙈'}
+                      </button>
+                    </div>
+                    <span className="text-[11px] text-slate-400 mt-1 block">
+                      Default PIN for all accounts is <strong>1234</strong>. You can also use the last 4 digits of your phone.
+                    </span>
                   </div>
 
                   <button
@@ -1292,10 +1324,21 @@ export function PatientLandingView({
                           setLoginCode('OPD-ARJUN')
                           setLoginPin('1234')
                         }}
-                        className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 p-2 text-left transition cursor-pointer"
+                        className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 p-2.5 text-left transition cursor-pointer"
                       >
                         <div className="font-bold text-slate-900 text-[11px]">Arjun Rao</div>
-                        <div className="text-[10px] text-slate-500 font-mono">OPD-ARJUN (A+)</div>
+                        <div className="text-[10px] text-slate-500 font-mono">OPD-ARJUN • PIN: 1234</div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLoginCode('SYN123456')
+                          setLoginPin('1234')
+                        }}
+                        className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 p-2.5 text-left transition cursor-pointer"
+                      >
+                        <div className="font-bold text-slate-900 text-[11px]">Aarav Sharma</div>
+                        <div className="text-[10px] text-slate-500 font-mono">SYN123456 • PIN: 1234</div>
                       </button>
                       <button
                         type="button"
@@ -1303,10 +1346,21 @@ export function PatientLandingView({
                           setLoginCode('ER-TRAUMA-01')
                           setLoginPin('1234')
                         }}
-                        className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 p-2 text-left transition cursor-pointer"
+                        className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 p-2.5 text-left transition cursor-pointer"
                       >
                         <div className="font-bold text-slate-900 text-[11px]">Trauma ER</div>
-                        <div className="text-[10px] text-slate-500 font-mono">ER-TRAUMA-01 (O-)</div>
+                        <div className="text-[10px] text-slate-500 font-mono">ER-TRAUMA-01 • PIN: 1234</div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLoginCode('SYN772109')
+                          setLoginPin('1234')
+                        }}
+                        className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 p-2.5 text-left transition cursor-pointer"
+                      >
+                        <div className="font-bold text-slate-900 text-[11px]">Priya Sharma</div>
+                        <div className="text-[10px] text-slate-500 font-mono">SYN772109 • PIN: 1234</div>
                       </button>
                     </div>
                   </div>
@@ -1962,17 +2016,35 @@ export function PatientLandingView({
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="font-bold text-slate-700">Security PIN</label>
+                  <div className="flex items-center gap-1.5">
+                    <label className="font-bold text-slate-700">Security PIN</label>
+                    <button
+                      type="button"
+                      onClick={() => setSwitchPinInput('1234')}
+                      className="text-[9px] font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 px-1.5 py-0.2 rounded transition cursor-pointer"
+                    >
+                      Fill 1234
+                    </button>
+                  </div>
                   <span className="text-[10px] text-slate-400 font-mono">Demo: 1234</span>
                 </div>
-                <input
-                  type="password"
-                  required
-                  value={switchPinInput}
-                  onChange={(e) => setSwitchPinInput(e.target.value)}
-                  placeholder="••••"
-                  className="w-full rounded-xl border border-slate-300 p-2.5 font-mono text-center tracking-widest font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
-                />
+                <div className="relative">
+                  <input
+                    type={showSwitchPin ? 'text' : 'password'}
+                    required
+                    value={switchPinInput}
+                    onChange={(e) => setSwitchPinInput(e.target.value)}
+                    placeholder="••••"
+                    className="w-full rounded-xl border border-slate-300 p-2.5 font-mono text-center tracking-widest font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSwitchPin(!showSwitchPin)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 text-xs cursor-pointer"
+                  >
+                    {showSwitchPin ? '👁️' : '🙈'}
+                  </button>
+                </div>
               </div>
 
               <div className="pt-2 flex gap-2">
