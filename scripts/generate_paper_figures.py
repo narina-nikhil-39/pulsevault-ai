@@ -28,23 +28,23 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 def generate_fig1_pipeline_architecture():
     """Figure 1: 7-Stage Multi-Agent Architecture Data Flow Diagram"""
-    fig, ax = plt.subplots(figsize=(10, 4.2), dpi=300)
+    fig, ax = plt.subplots(figsize=(11, 4.4), dpi=300)
     ax.axis('off')
 
     stages = [
-        ("1. Ingestion Agent", "Multi-Tier PDF/OCR\nPyMuPDF & Vision", "#2563EB"),
-        ("2. Extraction Agent", "Gemini 2.5 Flash\nStructured Entities", "#0284C7"),
-        ("3. Normalization", "RxNorm, LOINC,\nSNOMED, ICD-10", "#0D9488"),
-        ("4. Temporal Graph", "NetworkX / Neo4j\nSuperseding Links", "#16A34A"),
-        ("5. Safety Interlocks", "100% Deterministic\nRules (Metformin/CrCl)", "#DC2626"),
-        ("6. Flashcard Agent", "Pre-computed Cache\n<4ms Triage Retrieval", "#7C3AED"),
-        ("7. Break-Glass", "Dual-Auth & SHA-256\nAudit Blockchain", "#D97706"),
+        ("1. Ingestion / OCR", "PyMuPDF & Vision\nClassifier Routing", "#2563EB"),
+        ("2. Extraction", "Gemini 2.5 Flash\n/ Lexicon Fallback", "#0284C7"),
+        ("3. Normalization", "SNOMED / RxNorm\nLOINC / ICD-10", "#0D9488"),
+        ("4. Spatial Indexing", "Qdrant Vector Store\n2D Bounding Boxes", "#059669"),
+        ("5. Temporal Graph", "NetworkX & Neo4j\nDose Superseding", "#16A34A"),
+        ("6. Safety Engine", "100% Deterministic\nRules (Metformin/CrCl)", "#DC2626"),
+        ("7. Flashcard Cache", "Precomputed Summary\n3.57ms Emergency Triage", "#7C3AED"),
     ]
 
     n = len(stages)
-    width = 1.15
-    height = 1.3
-    spacing = 1.42
+    width = 1.25
+    height = 1.35
+    spacing = 1.52
 
     for i, (title, subtitle, color) in enumerate(stages):
         x = i * spacing + 0.2
@@ -60,7 +60,7 @@ def generate_fig1_pipeline_architecture():
         ax.add_patch(badge)
 
         ax.text(x + width/2, y + height - 0.16, title, ha='center', va='center',
-                fontsize=7.5, fontweight='bold', color='white')
+                fontsize=7.8, fontweight='bold', color='white')
 
         ax.text(x + width/2, y + (height - 0.32)/2, subtitle, ha='center', va='center',
                 fontsize=6.8, color='#1E293B', multialignment='center')
@@ -69,14 +69,14 @@ def generate_fig1_pipeline_architecture():
         if i < n - 1:
             arrow_x = x + width + 0.03
             arrow_y = y + height/2
-            ax.annotate('', xy=(arrow_x + 0.21, arrow_y), xytext=(arrow_x, arrow_y),
+            ax.annotate('', xy=(arrow_x + 0.22, arrow_y), xytext=(arrow_x, arrow_y),
                         arrowprops=dict(arrowstyle="->,head_width=0.25,head_length=0.35",
                                         color="#64748B", lw=1.6))
 
-    ax.set_xlim(0, n * spacing + 0.1)
+    ax.set_xlim(0, n * spacing + 0.2)
     ax.set_ylim(0.5, 3.2)
     fig.suptitle("Figure 1: PulseVault AI 7-Stage Multi-Agent Clinical Ingestion & Safety Architecture",
-                 fontsize=10.5, fontweight='bold', y=0.92, color='#0F172A')
+                 fontsize=11, fontweight='bold', y=0.92, color='#0F172A')
 
     plt.tight_layout()
     fig.savefig(OUT_DIR / "fig1_architecture.png", dpi=300, bbox_inches='tight')

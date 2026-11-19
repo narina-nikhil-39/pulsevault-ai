@@ -1,174 +1,235 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1781.4799999999998 1321.9" width="1781.4799999999998" height="1321.9" style="--bg:#1F1F1F;--fg:#CCCCCC;--line:#CCCCCC;--accent:#0078D4;--muted:#CCCCCCCC;--surface:#181818;--border:#CCCCCC;background:var(--bg)">
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
-  text { font-family: 'Inter', system-ui, sans-serif; }
-  svg {
-    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
-    --_text:          var(--fg);
-    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
-    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
-    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
-    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
-    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
-    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
-    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
-    --_group-fill:    var(--bg);
-    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
-    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
-    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
-  }
-</style>
-<defs>
-  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
-    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
-  </marker>
-  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
-    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
-  </marker>
-</defs>
-<g class="subgraph" data-id="ClientLayer" data-label="Frontend Layer (React 19 + Vite 8 + Tailwind 4)">
-  <rect x="40" y="40" width="1701.4799999999998" height="96.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
-  <rect x="40" y="40" width="1701.4799999999998" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
-  <text x="52" y="54" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Frontend Layer (React 19 + Vite 8 + Tailwind 4)</text>
-</g>
-<g class="subgraph" data-id="GatewayLayer" data-label="API Gateway Layer (FastAPI)">
-  <rect x="281.67674999999997" y="196.9" width="797.0169999999998" height="96.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
-  <rect x="281.67674999999997" y="196.9" width="797.0169999999998" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
-  <text x="293.67674999999997" y="210.9" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">API Gateway Layer (FastAPI)</text>
-</g>
-<g class="subgraph" data-id="AgentPipeline" data-label="7-Stage Multi-Agent Processing Pipeline">
-  <rect x="464.99974999999995" y="353.8" width="924.2129999999997" height="606.3" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
-  <rect x="464.99974999999995" y="353.8" width="924.2129999999997" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
-  <text x="476.99974999999995" y="367.8" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">7-Stage Multi-Agent Processing Pipeline</text>
-</g>
-<g class="subgraph" data-id="StorageLayer" data-label="Data &amp; Persistence Layer">
-  <rect x="892.0409999999997" y="1020.0999999999999" width="409.178" height="110.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
-  <rect x="892.0409999999997" y="1020.0999999999999" width="409.178" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
-  <text x="904.0409999999997" y="1034.1" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Data &amp; Persistence Layer</text>
-</g>
-<g class="subgraph" data-id="ExternalApis" data-label="External Clinical Lexicon Services">
-  <rect x="358.74879166666653" y="1185" width="712.9879999999998" height="96.9" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
-  <rect x="358.74879166666653" y="1185" width="712.9879999999998" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
-  <text x="370.74879166666653" y="1199" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">External Clinical Lexicon Services</text>
-</g>
-<polyline class="edge" data-from="UI" data-to="API" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="671.8489999999998,120.9 671.8489999999999,178.9 656.4732499999999,178.9 656.4732499999999,240.9" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="AuthView" data-to="JWT" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="901.4844999999998,120.9 901.4844999999998,178.9 916.86025,178.9 916.8602499999998,240.9" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="API" data-to="Stage1" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="656.4732499999999,277.8 656.4732499999999,397.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage1" data-to="GeminiAPI" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="Vision OCR" points="597.9820833333332,434.70000000000005 597.9820833333332,446.70000000000005 565.4594999999999,446.70000000000005 565.4594999999999,1098.7 478.48429166666654,1098.7 478.48429166666654,1167 476.91112499999986,1167 476.91112499999986,1229" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage2" data-to="GeminiAPI" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="Structured Extraction" points="690.4778333333333,519.6 690.4778333333333,531.6 654.9912499999999,531.6 654.9912499999999,1098.7 579.0734583333332,1098.7 579.0734583333332,1229" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage3" data-to="RxNavAPI" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="RxNorm Codes" points="781.9855833333332,604.5 781.9855833333332,616.5 729.703,616.5 729.703,1098.7 766.327,1098.7 766.327,1167 882.4862916666664,1167 882.4862916666664,1229" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage4" data-to="DB" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="950.2624999999999,689.4 950.2624999999999,713.4000000000001 1000.8929999999997,713.4000000000001 1000.8929999999997,1064.1" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage5" data-to="DB" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1040.53525,774.3000000000001 1040.53525,798.3 1000.8929999999997,798.3 1000.8929999999997,1064.1" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage6" data-to="DB" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1136.18025,859.1999999999999 1136.18025,883.2 1000.8929999999997,883.2 1000.8929999999997,1064.1" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage7" data-to="AuditStore" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1218.8577499999997,944.0999999999999 1218.8577499999997,1002.0999999999999 1203.4819999999997,1002.0999999999999 1203.4819999999995,1064.1" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage1" data-to="Stage2" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="714.9644166666666,434.70000000000005 714.9644166666666,446.70000000000005 747.4869999999999,446.70000000000005 747.4869999999999,482.70000000000005" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage2" data-to="Stage3" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="804.4961666666666,519.6 804.4961666666666,531.6 839.9827499999999,531.6 839.9827499999999,567.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage3" data-to="Stage4" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="897.9799166666666,604.5 897.9799166666666,616.5 950.2624999999998,616.5 950.2624999999998,652.5" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage4" data-to="Stage5" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="950.2624999999999,689.4 950.2624999999999,713.4000000000001 1040.53525,713.4000000000001 1040.53525,737.4000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage5" data-to="Stage6" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1040.53525,774.3000000000001 1040.53525,798.3 1136.18025,798.3 1136.18025,822.3" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<polyline class="edge" data-from="Stage6" data-to="Stage7" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="1136.18025,859.1999999999999 1136.18025,883.2 1218.85775,883.2 1218.85775,907.2" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
-<g class="edge-label" data-from="Stage1" data-to="GeminiAPI" data-label="Vision OCR">
-  <rect x="442.98429166666654" y="1105.7" width="70.516" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
-  <text x="478.2422916666665" y="1120.8500000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Vision OCR</text>
-</g>
-<g class="edge-label" data-from="Stage2" data-to="GeminiAPI" data-label="Structured Extraction">
-  <rect x="519.0734583333333" y="1105.7" width="119.22400000000002" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
-  <text x="578.6854583333333" y="1120.8500000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Structured Extraction</text>
-</g>
-<g class="edge-label" data-from="Stage3" data-to="RxNavAPI" data-label="RxNorm Codes">
-  <rect x="721.827" y="1105.7" width="88.33600000000001" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
-  <text x="765.995" y="1120.8500000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">RxNorm Codes</text>
-</g>
-<g class="node" data-id="UI" data-label="React SPA Single Page App" data-shape="rectangle">
-  <rect x="570.1049999999998" y="84" width="203.488" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="671.8489999999998" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">React SPA Single Page App</text>
-</g>
-<g class="node" data-id="AuthView" data-label="Login &amp; Authentication Gate" data-shape="rectangle">
-  <rect x="801.5929999999998" y="84" width="199.78299999999996" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="901.4844999999998" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Login &amp; Authentication Gate</text>
-</g>
-<g class="node" data-id="IngestView" data-label="Document Ingestion &amp; Live Agent Trace" data-shape="rectangle">
-  <rect x="272.6679999999999" y="84" width="269.43699999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="407.38649999999984" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Document Ingestion &amp; Live Agent Trace</text>
-</g>
-<g class="node" data-id="PatientView" data-label="Patient Profile &amp; Summary" data-shape="rectangle">
-  <rect x="1029.3759999999997" y="84" width="189.409" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="1124.0804999999998" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Patient Profile &amp; Summary</text>
-</g>
-<g class="node" data-id="TimelineView" data-label="Temporal Graph Timeline" data-shape="rectangle">
-  <rect x="56" y="84" width="188.66799999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="150.33399999999997" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Temporal Graph Timeline</text>
-</g>
-<g class="node" data-id="SafetyView" data-label="Safety Alerts &amp; Rule Checker" data-shape="rectangle">
-  <rect x="1246.7849999999999" y="84" width="209.41600000000003" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="1351.493" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Safety Alerts &amp; Rule Checker</text>
-</g>
-<g class="node" data-id="FlashcardView" data-label="Emergency Flashcard &amp; Summary" data-shape="rectangle">
-  <rect x="1484.2009999999998" y="84" width="241.279" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="1604.8404999999998" y="102.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Emergency Flashcard &amp; Summary</text>
-</g>
-<g class="node" data-id="API" data-label="FastAPI Gateway (/api)" data-shape="rectangle">
-  <rect x="569.9197499999999" y="240.9" width="173.10699999999997" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="656.4732499999999" y="259.35" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">FastAPI Gateway (/api)</text>
-</g>
-<g class="node" data-id="JWT" data-label="PBKDF2 Password Hashing &amp; Bearer Auth" data-shape="rectangle">
-  <rect x="771.0267499999999" y="240.9" width="291.6669999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="916.8602499999998" y="259.35" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">PBKDF2 Password Hashing &amp; Bearer Auth</text>
-</g>
-<g class="node" data-id="CORS" data-label="Strict CORS &amp; Security Middleware" data-shape="rectangle">
-  <rect x="297.67674999999997" y="240.9" width="244.24299999999997" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="419.79824999999994" y="259.35" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Strict CORS &amp; Security Middleware</text>
-</g>
-<g class="node" data-id="Stage1" data-label="1. Ingestion Agent (PyMuPDF OCR / Lexicon Fallback)" data-shape="rectangle">
-  <rect x="480.99974999999995" y="397.8" width="350.9469999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="656.4732499999999" y="416.25" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">1. Ingestion Agent (PyMuPDF OCR / Lexicon Fallback)</text>
-</g>
-<g class="node" data-id="Stage2" data-label="2. Extraction Agent (Gemini 2.5 Flash / Lexicon NLP)" data-shape="rectangle">
-  <rect x="576.4594999999999" y="482.70000000000005" width="342.05499999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="747.4869999999999" y="501.15000000000003" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">2. Extraction Agent (Gemini 2.5 Flash / Lexicon NLP)</text>
-</g>
-<g class="node" data-id="Stage3" data-label="3. Terminology Agent (RxNorm &amp; ICD-10-PCS Mapper)" data-shape="rectangle">
-  <rect x="665.9912499999999" y="567.6" width="347.98299999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="839.9827499999999" y="586.0500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">3. Terminology Agent (RxNorm &amp; ICD-10-PCS Mapper)</text>
-</g>
-<g class="node" data-id="Stage4" data-label="4. Temporal Graph Agent (Chronological Timeline &amp; Superseding)" data-shape="rectangle">
-  <rect x="740.703" y="652.5" width="419.1189999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="950.2624999999999" y="670.95" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">4. Temporal Graph Agent (Chronological Timeline &amp; Superseding)</text>
-</g>
-<g class="node" data-id="Stage5" data-label="5. Deterministic Safety Agent (Metformin/CrCl Rules)" data-shape="rectangle">
-  <rect x="870.9897499999998" y="737.4000000000001" width="339.09099999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="1040.53525" y="755.8500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">5. Deterministic Safety Agent (Metformin/CrCl Rules)</text>
-</g>
-<g class="node" data-id="Stage6" data-label="6. Cache &amp; Performance Agent (Flashcard Aggregator)" data-shape="rectangle">
-  <rect x="955.8902499999999" y="822.3" width="360.57999999999987" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="1136.18025" y="840.75" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">6. Cache &amp; Performance Agent (Flashcard Aggregator)</text>
-</g>
-<g class="node" data-id="Stage7" data-label="7. Audit Logger (Immutable Clinical Event Trail)" data-shape="rectangle">
-  <rect x="1064.5027499999999" y="907.2" width="308.70999999999987" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="1218.85775" y="925.6500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">7. Audit Logger (Immutable Clinical Event Trail)</text>
-</g>
-<g class="node" data-id="DB" data-label="SQLite Clinical Database" data-shape="cylinder">
-  <rect x="908.0409999999997" y="1071.1" width="185.70399999999998" height="36.900000000000006" fill="var(--_node-fill)" stroke="none" />
-  <line x1="908.0409999999997" y1="1071.1" x2="908.0409999999997" y2="1108" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <line x1="1093.7449999999997" y1="1071.1" x2="1093.7449999999997" y2="1108" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <ellipse cx="1000.8929999999997" cy="1108" rx="92.85199999999999" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <ellipse cx="1000.8929999999997" cy="1071.1" rx="92.85199999999999" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="1000.8929999999997" y="1089.55" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">SQLite Clinical Database</text>
-</g>
-<g class="node" data-id="AuditStore" data-label="Immutable Audit Logs" data-shape="cylinder">
-  <rect x="1121.7449999999997" y="1071.1" width="163.474" height="36.900000000000006" fill="var(--_node-fill)" stroke="none" />
-  <line x1="1121.7449999999997" y1="1071.1" x2="1121.7449999999997" y2="1108" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <line x1="1285.2189999999996" y1="1071.1" x2="1285.2189999999996" y2="1108" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <ellipse cx="1203.4819999999997" cy="1108" rx="81.737" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <ellipse cx="1203.4819999999997" cy="1071.1" rx="81.737" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="1203.4819999999997" y="1089.55" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Immutable Audit Logs</text>
-</g>
-<g class="node" data-id="GeminiAPI" data-label="Gemini 2.5 Flash API (Multimodal OCR/Extract)" data-shape="rectangle">
-  <rect x="374.74879166666653" y="1229" width="306.4869999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="527.9922916666665" y="1247.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Gemini 2.5 Flash API (Multimodal OCR/Extract)</text>
-</g>
-<g class="node" data-id="RxNavAPI" data-label="RxNav / NLM REST API (RxNorm Normalized Codes)" data-shape="rectangle">
-  <rect x="709.2357916666665" y="1229" width="346.5009999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
-  <text x="882.4862916666665" y="1247.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">RxNav / NLM REST API (RxNorm Normalized Codes)</text>
-</g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1480 960" width="1480" height="960" style="background:#0F121C; font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <!-- Grid pattern background -->
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#1E2638" />
+    </pattern>
+
+    <!-- Marker Arrow -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#64748B" />
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#3B82F6" />
+    </marker>
+    <marker id="arrow-emerald" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#10B981" />
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#8B5CF6" />
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#F59E0B" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#0A0D16" />
+  <rect width="100%" height="100%" fill="url(#grid)" />
+
+  <!-- ==================== TIER 1: TRI-PARTY FRONTEND CLIENTS ==================== -->
+  <g id="clients-group">
+    <rect x="30" y="240" width="220" height="420" rx="16" fill="#111827" fill-opacity="0.6" stroke="#3B82F6" stroke-width="1.5" stroke-dasharray="4 4" />
+    <text x="45" y="268" fill="#93C5FD" font-size="12" font-weight="800" letter-spacing="0.5">Tri-Party Frontend (React 19)</text>
+
+    <!-- Client 1: Doctor Console -->
+    <rect x="50" y="295" width="180" height="90" rx="12" fill="#1E293B" stroke="#38BDF8" stroke-width="1.5" />
+    <text x="65" y="325" fill="#38BDF8" font-size="12" font-weight="700">🩺 Doctor Console</text>
+    <text x="65" y="345" fill="#94A3B8" font-size="10">Longitudinal Timeline</text>
+    <text x="65" y="362" fill="#64748B" font-size="9" font-family="monospace">Route: /doctor</text>
+
+    <!-- Client 2: Reception Desk -->
+    <rect x="50" y="405" width="180" height="90" rx="12" fill="#1E293B" stroke="#F43F5E" stroke-width="1.5" />
+    <text x="65" y="435" fill="#FB7185" font-size="12" font-weight="700">🚨 Reception Desk</text>
+    <text x="65" y="455" fill="#94A3B8" font-size="10">Camera QR Triage &amp; Queue</text>
+    <text x="65" y="472" fill="#64748B" font-size="9" font-family="monospace">Route: /reception</text>
+
+    <!-- Client 3: Patient Locker -->
+    <rect x="50" y="515" width="180" height="90" rx="12" fill="#1E293B" stroke="#10B981" stroke-width="1.5" />
+    <text x="65" y="545" fill="#34D399" font-size="12" font-weight="700">📱 Patient Locker</text>
+    <text x="65" y="565" fill="#94A3B8" font-size="10">Self-Enroll &amp; QR Pass</text>
+    <text x="65" y="582" fill="#64748B" font-size="9" font-family="monospace">Route: /patient</text>
+  </g>
+
+  <!-- ==================== TIER 2: WEB GATEWAY & SECURITY LAYER ==================== -->
+  <g id="gateway-group">
+    <rect x="290" y="140" width="270" height="680" rx="16" fill="#111827" fill-opacity="0.6" stroke="#EC4899" stroke-width="1.5" stroke-dasharray="4 4" />
+    <text x="305" y="168" fill="#F472B6" font-size="12" font-weight="800" letter-spacing="0.5">Web Gateway &amp; Security Layer</text>
+
+    <!-- Auth Gateway -->
+    <rect x="310" y="195" width="230" height="90" rx="12" fill="#1F1528" stroke="#D946EF" stroke-width="1.5" />
+    <text x="325" y="225" fill="#E879F9" font-size="12" font-weight="700">🛡️ Auth Gateway</text>
+    <text x="325" y="245" fill="#94A3B8" font-size="10">PBKDF2-SHA256 Passwords</text>
+    <text x="325" y="262" fill="#C084FC" font-size="9" font-family="monospace">Scoped Ephemeral JWTs</text>
+
+    <!-- FastAPI Gateway -->
+    <rect x="310" y="340" width="230" height="135" rx="12" fill="#0C2538" stroke="#0EA5E9" stroke-width="1.8" />
+    <text x="325" y="370" fill="#38BDF8" font-size="13" font-weight="800">&lt;/&gt; FastAPI Web Gateway</text>
+    <text x="325" y="390" fill="#94A3B8" font-size="10">app/main.py :8000</text>
+    <text x="325" y="415" fill="#E2E8F0" font-size="10">Uvicorn ASGI + BackgroundTasks</text>
+    <!-- Outbound FHIR Badge -->
+    <rect x="325" y="430" width="195" height="28" rx="6" fill="#047857" fill-opacity="0.3" stroke="#10B981" stroke-width="1" />
+    <text x="335" y="448" fill="#6EE7B7" font-size="9.5" font-weight="700">⚡ Outbound: HL7 FHIR R4 Export</text>
+
+    <!-- SHA-256 Audit Chain + Break-Glass -->
+    <rect x="310" y="530" width="230" height="120" rx="12" fill="#2A1215" stroke="#F43F5E" stroke-width="1.5" />
+    <text x="325" y="558" fill="#FB7185" font-size="11.5" font-weight="700">🔒 SHA-256 Audit Chain</text>
+    <text x="325" y="578" fill="#FDA4AF" font-size="11" font-weight="700">+ Dual-Signature Break-Glass</text>
+    <text x="325" y="600" fill="#94A3B8" font-size="10">Immutable Block Hash Ledger</text>
+    <text x="325" y="618" fill="#F43F5E" font-size="9" font-family="monospace">GET /api/emergency/audit-chain</text>
+  </g>
+
+  <!-- ==================== TIER 3: 7-STAGE MULTI-AGENT INGESTION PIPELINE ==================== -->
+  <g id="pipeline-group">
+    <rect x="600" y="50" width="280" height="860" rx="16" fill="#111827" fill-opacity="0.6" stroke="#F59E0B" stroke-width="1.8" stroke-dasharray="4 4" />
+    <text x="615" y="78" fill="#FBBF24" font-size="12" font-weight="800" letter-spacing="0.5">7-Stage Multi-Agent Pipeline</text>
+
+    <!-- Stage 1 -->
+    <rect x="620" y="95" width="240" height="85" rx="10" fill="#1E293B" stroke="#3B82F6" stroke-width="1.3" />
+    <text x="635" y="122" fill="#60A5FA" font-size="11" font-weight="700">1. Ingestion / OCR</text>
+    <text x="635" y="142" fill="#94A3B8" font-size="9.5">PyMuPDF Text + Vision Routing</text>
+    <text x="635" y="158" fill="#64748B" font-size="8.5" font-family="monospace">src/agents/ingestion_agent.py</text>
+
+    <!-- Stage 2 -->
+    <rect x="620" y="200" width="240" height="85" rx="10" fill="#1E293B" stroke="#0284C7" stroke-width="1.3" />
+    <text x="635" y="227" fill="#38BDF8" font-size="11" font-weight="700">2. Clinical Extraction</text>
+    <text x="635" y="247" fill="#94A3B8" font-size="9.5">Gemini 2.5 Flash / Lexicon NLP</text>
+    <text x="635" y="263" fill="#64748B" font-size="8.5" font-family="monospace">src/agents/extraction_agent.py</text>
+
+    <!-- Stage 3 -->
+    <rect x="620" y="305" width="240" height="85" rx="10" fill="#1E293B" stroke="#0D9488" stroke-width="1.3" />
+    <text x="635" y="332" fill="#2DD4BF" font-size="11" font-weight="700">3. Terminology Normalization</text>
+    <text x="635" y="352" fill="#94A3B8" font-size="9.5">RxNorm CUI / LOINC / SNOMED</text>
+    <text x="635" y="368" fill="#64748B" font-size="8.5" font-family="monospace">src/services/drug_lookup_service.py</text>
+
+    <!-- Stage 4 -->
+    <rect x="620" y="410" width="240" height="85" rx="10" fill="#064E3B" fill-opacity="0.4" stroke="#10B981" stroke-width="1.5" />
+    <text x="635" y="437" fill="#34D399" font-size="11" font-weight="800">4. Spatial Vector Indexing</text>
+    <text x="635" y="457" fill="#A7F3D0" font-size="9.5">384-dim Embeddings + 2D Bbox</text>
+    <text x="635" y="473" fill="#6EE7B7" font-size="8.5" font-family="monospace">src/services/rag_service.py</text>
+
+    <!-- Stage 5 -->
+    <rect x="620" y="515" width="240" height="85" rx="10" fill="#1E293B" stroke="#16A34A" stroke-width="1.3" />
+    <text x="635" y="542" fill="#4ADE80" font-size="11" font-weight="700">5. Temporal Knowledge Graph</text>
+    <text x="635" y="562" fill="#94A3B8" font-size="9.5">NetworkX Chronology &amp; Superseding</text>
+    <text x="635" y="578" fill="#64748B" font-size="8.5" font-family="monospace">src/agents/temporal_graph_agent.py</text>
+
+    <!-- Stage 6 -->
+    <rect x="620" y="620" width="240" height="85" rx="10" fill="#2A1215" stroke="#DC2626" stroke-width="1.5" />
+    <text x="635" y="647" fill="#F87171" font-size="11" font-weight="800">6. Deterministic Safety Engine</text>
+    <text x="635" y="667" fill="#FCA5A5" font-size="9.5">100% Sensitivity Renal &amp; DDI Rules</text>
+    <text x="635" y="683" fill="#EF4444" font-size="8.5" font-family="monospace">src/engine/safety_rules.py</text>
+
+    <!-- Stage 7 -->
+    <rect x="620" y="725" width="240" height="85" rx="10" fill="#1E1B4B" stroke="#7C3AED" stroke-width="1.5" />
+    <text x="635" y="752" fill="#A78BFA" font-size="11" font-weight="800">7. Emergency Flashcard Cache</text>
+    <text x="635" y="772" fill="#C4B5FD" font-size="9.5">3.57ms Sub-4ms Triage Retrieval</text>
+    <text x="635" y="788" fill="#8B5CF6" font-size="8.5" font-family="monospace">src/agents/flashcard_agent.py</text>
+  </g>
+
+  <!-- ==================== TIER 4: POLYGLOT STORAGE LAYER ==================== -->
+  <g id="storage-group">
+    <rect x="920" y="400" width="260" height="430" rx="16" fill="#111827" fill-opacity="0.6" stroke="#A855F7" stroke-width="1.5" stroke-dasharray="4 4" />
+    <text x="935" y="428" fill="#C084FC" font-size="12" font-weight="800" letter-spacing="0.5">Polyglot Storage Layer</text>
+
+    <!-- Storage 1: Qdrant Vector DB (Linked from Stage 4) -->
+    <rect x="940" y="445" width="220" height="85" rx="12" fill="#1C1929" stroke="#E11D48" stroke-width="1.5" />
+    <text x="955" y="475" fill="#FB7185" font-size="12" font-weight="800">🔴 Qdrant 1.11 Vector DB</text>
+    <text x="955" y="495" fill="#94A3B8" font-size="10">Spatial 2D Bbox Vectors (:6333)</text>
+    <text x="955" y="512" fill="#E11D48" font-size="9" font-family="monospace">Patient-Scoped Semantic Chunks</text>
+
+    <!-- Storage 2: Neo4j Knowledge Graph (Linked from Stage 5) -->
+    <rect x="940" y="550" width="220" height="85" rx="12" fill="#0C2538" stroke="#0284C7" stroke-width="1.5" />
+    <text x="955" y="580" fill="#38BDF8" font-size="12" font-weight="800">🔵 Neo4j 5.23 Graph DB</text>
+    <text x="955" y="600" fill="#94A3B8" font-size="10">Cypher Knowledge Graph (:7474)</text>
+    <text x="955" y="617" fill="#0284C7" font-size="9" font-family="monospace">nodes: Patient, Drug, Condition</text>
+
+    <!-- Storage 3: Relational DB (PostgreSQL 16 / SQLite WAL) -->
+    <rect x="940" y="655" width="220" height="95" rx="12" fill="#1F1528" stroke="#9333EA" stroke-width="1.5" />
+    <text x="955" y="685" fill="#C084FC" font-size="11.5" font-weight="800">🟣 PostgreSQL 16 / SQLite</text>
+    <text x="955" y="705" fill="#94A3B8" font-size="10">WAL Mode • Primary Records</text>
+    <text x="955" y="722" fill="#94A3B8" font-size="9.5">Patients, FlashcardCache, AuditChain</text>
+    <text x="955" y="738" fill="#A855F7" font-size="9" font-family="monospace">DATABASE_URL Dynamic Binding</text>
+  </g>
+
+  <!-- ==================== TIER 5: EXTERNAL MEDICAL & INTELLIGENCE APIS ==================== -->
+  <g id="external-group">
+    <rect x="1220" y="100" width="230" height="250" rx="16" fill="#111827" fill-opacity="0.6" stroke="#EAB308" stroke-width="1.5" stroke-dasharray="4 4" />
+    <text x="1235" y="128" fill="#FDE047" font-size="12" font-weight="800" letter-spacing="0.5">External Medical &amp; AI APIs</text>
+
+    <!-- Gemini 2.5 Flash -->
+    <rect x="1240" y="145" width="190" height="85" rx="12" fill="#2E2413" stroke="#F59E0B" stroke-width="1.5" />
+    <text x="1255" y="175" fill="#FBBF24" font-size="11.5" font-weight="800">☁️ Gemini 2.5 Flash</text>
+    <text x="1255" y="195" fill="#D1D5DB" font-size="10">Multimodal Vision OCR</text>
+    <text x="1255" y="212" fill="#F59E0B" font-size="9" font-family="monospace">Google GenAI SDK</text>
+
+    <!-- RxNav / OpenFDA -->
+    <rect x="1240" y="245" width="190" height="85" rx="12" fill="#1F2417" stroke="#84CC16" stroke-width="1.5" />
+    <text x="1255" y="275" fill="#A3E635" font-size="11.5" font-weight="800">💊 NLM RxNav / OpenFDA</text>
+    <text x="1255" y="295" fill="#D1D5DB" font-size="10">RxNorm CUI / LOINC / ATC</text>
+    <text x="1255" y="312" fill="#84CC16" font-size="9" font-family="monospace">REST API + Local Cache</text>
+  </g>
+
+  <!-- ==================== CONNECTING FLOW ARROWS ==================== -->
+
+  <!-- Clients -> FastAPI Gateway -->
+  <path d="M 230 340 L 270 340 L 270 390 L 310 390" fill="none" stroke="#38BDF8" stroke-width="1.5" marker-end="url(#arrow-blue)" />
+  <path d="M 230 450 L 310 405" fill="none" stroke="#F43F5E" stroke-width="1.5" marker-end="url(#arrow)" />
+  <path d="M 230 560 L 270 560 L 270 420 L 310 420" fill="none" stroke="#10B981" stroke-width="1.5" marker-end="url(#arrow-emerald)" />
+
+  <!-- FastAPI Gateway <-> Auth Gateway & Audit -->
+  <path d="M 425 340 L 425 285" fill="none" stroke="#D946EF" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#arrow)" />
+  <path d="M 425 475 L 425 530" fill="none" stroke="#F43F5E" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- FastAPI Gateway -> Pipeline Stage 1 -->
+  <path d="M 540 370 L 580 370 L 580 137 L 620 137" fill="none" stroke="#38BDF8" stroke-width="2" marker-end="url(#arrow-blue)" />
+
+  <!-- Sequential Pipeline Arrows (Stage 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7) -->
+  <path d="M 740 180 L 740 200" fill="none" stroke="#64748B" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 740 285 L 740 305" fill="none" stroke="#64748B" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 740 390 L 740 410" fill="none" stroke="#64748B" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 740 495 L 740 515" fill="none" stroke="#64748B" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 740 600 L 740 620" fill="none" stroke="#64748B" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 740 705 L 740 725" fill="none" stroke="#64748B" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Pipeline -> Polyglot Storage Layer -->
+  <!-- Stage 4 -> Qdrant -->
+  <path d="M 860 452 L 940 475" fill="none" stroke="#E11D48" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Stage 5 -> Neo4j -->
+  <path d="M 860 557 L 940 580" fill="none" stroke="#0284C7" stroke-width="2" marker-end="url(#arrow-blue)" />
+
+  <!-- Stage 6 & 7 -> Relational Database -->
+  <path d="M 860 662 L 900 662 L 900 690 L 940 690" fill="none" stroke="#9333EA" stroke-width="2" marker-end="url(#arrow-purple)" />
+  <path d="M 860 767 L 910 767 L 910 710 L 940 710" fill="none" stroke="#7C3AED" stroke-width="2" marker-end="url(#arrow-purple)" />
+
+  <!-- Pipeline <-> External APIs -->
+  <!-- Stage 1 & 2 <-> Gemini -->
+  <path d="M 860 145 L 1240 175" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#arrow-amber)" />
+  <path d="M 860 235 L 1240 195" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#arrow-amber)" />
+
+  <!-- Stage 3 <-> RxNav -->
+  <path d="M 860 340 L 1240 280" fill="none" stroke="#84CC16" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#arrow)" />
+
+  <!-- Legend Bar -->
+  <g id="legend" transform="translate(40, 915)">
+    <rect x="0" y="0" width="1400" height="35" rx="8" fill="#111827" stroke="#1E293B" stroke-width="1" />
+    <circle cx="20" cy="18" r="5" fill="#38BDF8" />
+    <text x="32" y="22" fill="#94A3B8" font-size="10.5">Frontend Client</text>
+
+    <circle cx="160" cy="18" r="5" fill="#0EA5E9" />
+    <text x="172" y="22" fill="#94A3B8" font-size="10.5">Web Gateway / Backend</text>
+
+    <circle cx="350" cy="18" r="5" fill="#F43F5E" />
+    <text x="362" y="22" fill="#94A3B8" font-size="10.5">Security / Audit Chain</text>
+
+    <circle cx="530" cy="18" r="5" fill="#10B981" />
+    <text x="542" y="22" fill="#94A3B8" font-size="10.5">Agent Pipeline Stages (1-7)</text>
+
+    <circle cx="730" cy="18" r="5" fill="#A855F7" />
+    <text x="742" y="22" fill="#94A3B8" font-size="10.5">Polyglot Storage (Qdrant + Neo4j + Postgres/SQLite)</text>
+
+    <circle cx="1070" cy="18" r="5" fill="#F59E0B" />
+    <text x="1082" y="22" fill="#94A3B8" font-size="10.5">External Clinical Ontologies &amp; LLM</text>
+  </g>
 </svg>
