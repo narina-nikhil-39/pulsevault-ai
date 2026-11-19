@@ -615,6 +615,14 @@ export function PatientLandingView({
             )}
 
             <button
+              onClick={() => setShowRegisterWizard(true)}
+              className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition cursor-pointer"
+            >
+              <span>+</span>
+              <span>Register Patient</span>
+            </button>
+
+            <button
               onClick={() => {
                 if (onBookAppointmentRedirect) {
                   onBookAppointmentRedirect()
@@ -641,6 +649,7 @@ export function PatientLandingView({
             <span className="hover:text-white transition cursor-pointer" onClick={() => setActiveTab('family')}>Family Dependent Profiles</span>
             <span className="hover:text-white transition cursor-pointer" onClick={() => setActiveTab('triage')}>Emergency Triage 24/7</span>
             <span className="hover:text-white transition cursor-pointer" onClick={() => setActiveTab('voice')}>AI Medical Companion</span>
+            <span className="text-emerald-300 font-bold hover:text-white transition cursor-pointer" onClick={() => setShowRegisterWizard(true)}>+ Register Patient</span>
           </div>
           <span className="text-[11px] text-emerald-300 font-mono hidden md:inline">
             ✓ 100% Zero-Hallucination Verified
@@ -795,6 +804,12 @@ export function PatientLandingView({
 
                   <div className="flex items-center gap-2">
                     <button
+                      onClick={() => setShowRegisterWizard(true)}
+                      className="rounded-xl border border-emerald-600 bg-emerald-800/80 hover:bg-emerald-700 px-3 py-1.5 text-xs font-bold text-white transition cursor-pointer"
+                    >
+                      + Enroll Patient
+                    </button>
+                    <button
                       onClick={() => setShowSwitchModal(true)}
                       className="rounded-xl border border-emerald-700 bg-emerald-900/70 hover:bg-emerald-800 px-3 py-1.5 text-xs font-semibold text-emerald-100 transition cursor-pointer"
                     >
@@ -819,15 +834,23 @@ export function PatientLandingView({
                       </p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => {
-                      const el = document.getElementById('patient-auth-section')
-                      if (el) el.scrollIntoView({ behavior: 'smooth' })
-                    }}
-                    className="rounded-xl bg-amber-500 hover:bg-amber-600 px-3.5 py-1.5 text-xs font-bold text-slate-950 transition cursor-pointer shadow-xs"
-                  >
-                    Unlock Locker
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setShowRegisterWizard(true)}
+                      className="rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white transition cursor-pointer shadow-xs"
+                    >
+                      + Register Patient
+                    </button>
+                    <button
+                      onClick={() => {
+                        const el = document.getElementById('patient-auth-section')
+                        if (el) el.scrollIntoView({ behavior: 'smooth' })
+                      }}
+                      className="rounded-xl bg-amber-500 hover:bg-amber-600 px-3.5 py-1.5 text-xs font-bold text-slate-950 transition cursor-pointer shadow-xs"
+                    >
+                      Unlock Locker
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -1398,6 +1421,24 @@ export function PatientLandingView({
                   )}
                 </div>
               )}
+
+              {/* New Patient Registration Callout */}
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 text-center space-y-2">
+                <div className="text-xs font-bold text-slate-800">
+                  New to MediCare Pro &amp; PulseVault?
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Don't have an ABHA ID yet? Create a new digital health record with automatic ABHA ID generation and health locker enrollment.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterWizard(true)}
+                  className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 py-2.5 text-xs font-bold text-white shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <span>+</span>
+                  <span>Register New Patient &amp; Create Locker</span>
+                </button>
+              </div>
 
               {/* Security Assurance Badges */}
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
