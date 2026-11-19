@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { generateQrMatrix, QrMatrixSvg } from './QrMatrixSvg'
 
 interface WalletQrCardProps {
   patient: {
@@ -14,10 +15,6 @@ interface WalletQrCardProps {
 
 export function WalletQrCard({ patient }: WalletQrCardProps) {
   const [downloading, setDownloading] = useState(false)
-
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=4&data=${encodeURIComponent(
-    patient.patient_code,
-  )}`
 
   async function handleDownloadCard() {
     setDownloading(true)
@@ -105,20 +102,33 @@ export function WalletQrCard({ patient }: WalletQrCardProps) {
       ctx.font = 'bold 15px Inter, sans-serif'
       ctx.fillText('IN AN EMERGENCY: SCAN QR CODE AT TRIAGE FOR INSTANT SUB-4MS FLASHCARD ACCESS', 80, 545)
 
-      // Draw QR Code onto Canvas
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      img.src = qrUrl
+      // 100% Offline Vector QR Rendering onto Canvas
+      const modules = generateQrMatrix(patient.patient_code)
+      const qrBoxSize = 220
+      const qrStartX = 685
+      const qrStartY = 210
+      const pad = 2
+      const totalGrid = modules.length + pad * 2
+      const cellSize = qrBoxSize / totalGrid
 
-      await new Promise<void>((resolve) => {
-        img.onload = () => {
-          ctx.drawImage(img, 680, 205, 230, 230)
-          ctx.strokeStyle = '#E2E8F0'
-          ctx.lineWidth = 4
-          ctx.strokeRect(680, 205, 230, 230)
-          resolve()
-        }
-        img.onerror = () => resolve()
+      ctx.fillStyle = '#FFFFFF'
+      ctx.fillRect(qrStartX - 8, qrStartY - 8, qrBoxSize + 16, qrBoxSize + 16)
+      ctx.strokeStyle = '#E2E8F0'
+      ctx.lineWidth = 3
+      ctx.strokeRect(qrStartX - 8, qrStartY - 8, qrBoxSize + 16, qrBoxSize + 16)
+
+      ctx.fillStyle = '#0F172A'
+      modules.forEach((row, r) => {
+        row.forEach((cell, c) => {
+          if (cell) {
+            ctx.fillRect(
+              qrStartX + (c + pad) * cellSize,
+              qrStartY + (r + pad) * cellSize,
+              cellSize + 0.5,
+              cellSize + 0.5,
+            )
+          }
+        })
       })
 
       // Download PNG
@@ -143,8 +153,8 @@ export function WalletQrCard({ patient }: WalletQrCardProps) {
             <h3 className="text-sm font-black text-slate-900 tracking-tight">
               Patient Emergency Smart Wallet Card
             </h3>
-            <p className="text-[11px] text-slate-500">
-              Hold this digital pass in front of any hospital triage camera for instant check-in.
+            <p className="text-xs text-slate-500">
+              Instant offline-generated medical ID pass for rapid hardware QR camera check-in at hospital triage.
             </p>
           </div>
         </div>
@@ -187,14 +197,12 @@ export function WalletQrCard({ patient }: WalletQrCardProps) {
           </div>
         </div>
 
-        {/* QR Code Graphic */}
-        <div className="shrink-0 bg-white p-2 rounded-xl shadow-lg border-2 border-emerald-400 text-center">
-          <img
-            src={qrUrl}
-            alt={`QR Pass for ${patient.patient_code}`}
-            className="w-24 h-24 sm:w-28 sm:h-28"
-          />
-          <div className="text-[9px] font-mono font-bold text-slate-800 mt-1">SCAN AT TRIAGE</div>
+        {/* 100% Offline Vector QR Code Graphic */}
+        <div className="shrink-0 bg-white p-2 rounded-xl shadow-lg border-2 border-emerald-400 text-center flex flex-col items-center">
+          <QrMatrixSvg value={patient.patient_code} size={112} />
+          <div className="text-[9px] font-mono font-bold text-slate-800 mt-1 uppercase tracking-wider">
+            Offline Pass
+          </div>
         </div>
       </div>
     </div>

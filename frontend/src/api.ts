@@ -860,3 +860,157 @@ export function simulatePrescription(
     json: { candidate_drug: candidateDrug, dose: dose || null },
   })
 }
+
+// =============================================================================
+// Clinician Collaboration & Consent Sharing Client APIs
+// =============================================================================
+
+export interface ClinicianDirectoryEntry {
+  license_id: string
+  name: string
+  role: string
+  department: string
+  institution: string
+}
+
+export interface RecordShareGrant {
+  id: string
+  patient_code: string
+  shared_by_license_id: string
+  shared_by_name: string
+  shared_with_license_id: string
+  shared_with_name: string
+  shared_with_department: string
+  document_ids: string[]
+  include_full_flashcard: boolean
+  permission_level: 'Read & Annotate' | 'Full Care Consult'
+  clinical_note: string
+  created_at: string
+  expires_at: string
+  status: 'Active' | 'Revoked'
+  audit_block_hash: string
+}
+
+export interface ClinicalAnnotation {
+  id: string
+  patient_code: string
+  target_type: 'document' | 'medication' | 'lab' | 'alert' | 'vaccination' | 'condition'
+  target_id: string
+  target_label: string
+  author_license_id: string
+  author_name: string
+  author_department: string
+  priority: 'Clinical Note' | 'Action Required' | 'Handoff Alert'
+  body: string
+  created_at: string
+  resolved: boolean
+}
+
+export interface CareTeamMessage {
+  id: string
+  patient_code: string
+  sender_license_id: string
+  sender_name: string
+  sender_role: string
+  sender_department: string
+  body: string
+  urgency: 'Routine' | 'Urgent' | 'Critical'
+  attached_ref?: {
+    targetType: string
+    targetId: string
+    targetLabel: string
+  } | null
+  created_at: string
+  acknowledged_by: string[]
+}
+
+export function fetchClinicians(): Promise<ClinicianDirectoryEntry[]> {
+  return request<ClinicianDirectoryEntry[]>('/clinicians')
+}
+
+export function fetchRecordShares(patientCode: string): Promise<RecordShareGrant[]> {
+  return request<RecordShareGrant[]>(`/patients/${encodeURIComponent(patientCode)}/shares`)
+}
+
+export function createRecordShare(
+  patientCode: string,
+  payload: {
+    shared_with_license_id: string
+    document_ids?: string[]
+    include_full_flashcard?: boolean
+    permission_level?: string
+    clinical_note?: string
+    expires_in_days?: number
+  },
+): Promise<RecordShareGrant> {
+  return request<RecordShareGrant>(`/patients/${encodeURIComponent(patientCode)}/shares`, {
+    method: 'POST',
+    json: payload,
+  })
+}
+
+export function revokeRecordShare(patientCode: string, shareId: string): Promise<RecordShareGrant> {
+  return request<RecordShareGrant>(`/patients/${encodeURIComponent(patientCode)}/shares/${encodeURIComponent(shareId)}/revoke`, {
+    method: 'POST',
+  })
+}
+
+export function fetchClinicalAnnotations(patientCode: string): Promise<ClinicalAnnotation[]> {
+  return request<ClinicalAnnotation[]>(`/patients/${encodeURIComponent(patientCode)}/annotations`)
+}
+
+export function createClinicalAnnotation(
+  patientCode: string,
+  payload: {
+    target_type: string
+    target_id: string
+    target_label: string
+    priority?: string
+    body: string
+  },
+): Promise<ClinicalAnnotation> {
+  return request<ClinicalAnnotation>(`/patients/${encodeURIComponent(patientCode)}/annotations`, {
+    method: 'POST',
+    json: payload,
+  })
+}
+
+export function toggleClinicalAnnotation(patientCode: string, annotationId: string): Promise<ClinicalAnnotation> {
+  return request<ClinicalAnnotation>(
+    `/patients/${encodeURIComponent(patientCode)}/annotations/${encodeURIComponent(annotationId)}/toggle`,
+    {
+      method: 'POST',
+    },
+  )
+}
+
+export function fetchCareTeamMessages(patientCode: string): Promise<CareTeamMessage[]> {
+  return request<CareTeamMessage[]>(`/patients/${encodeURIComponent(patientCode)}/messages`)
+}
+
+export function sendCareTeamMessage(
+  patientCode: string,
+  payload: {
+    body: string
+    urgency?: 'Routine' | 'Urgent' | 'Critical'
+    attached_ref?: {
+      targetType: string
+      targetId: string
+      targetLabel: string
+    } | null
+  },
+): Promise<CareTeamMessage> {
+  return request<CareTeamMessage>(`/patients/${encodeURIComponent(patientCode)}/messages`, {
+    method: 'POST',
+    json: payload,
+  })
+}
+
+export function ackCareTeamMessage(patientCode: string, messageId: string): Promise<CareTeamMessage> {
+  return request<CareTeamMessage>(
+    `/patients/${encodeURIComponent(patientCode)}/messages/${encodeURIComponent(messageId)}/ack`,
+    {
+      method: 'POST',
+    },
+  )
+}

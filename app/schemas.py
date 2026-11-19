@@ -351,3 +351,99 @@ class SafetySimulateResponse(BaseModel):
     high_count: int
     findings: List[Dict[str, Any]]
     patient_context: Dict[str, Any]
+
+
+# =============================================================================
+# Clinician Collaboration & Consent Sharing Schemas
+# =============================================================================
+
+class ClinicianDirectoryEntry(BaseModel):
+    """Credentialed clinician profile for inter-departmental collaboration."""
+
+    license_id: str
+    name: str
+    role: str
+    department: str
+    institution: str
+
+
+class RecordShareCreateRequest(BaseModel):
+    """Payload to grant time-bounded clinical record access."""
+
+    shared_with_license_id: str
+    document_ids: List[str] = []
+    include_full_flashcard: bool = True
+    permission_level: str = "Full Care Consult"
+    clinical_note: str = ""
+    expires_in_days: int = 7
+
+
+class RecordShareGrantOut(BaseModel):
+    """Time-bounded clinical record consent grant with cryptographic verification."""
+
+    id: str
+    patient_code: str
+    shared_by_license_id: str
+    shared_by_name: str
+    shared_with_license_id: str
+    shared_with_name: str
+    shared_with_department: str
+    document_ids: List[str] = []
+    include_full_flashcard: bool = True
+    permission_level: str = "Full Care Consult"
+    clinical_note: str = ""
+    created_at: str
+    expires_at: str
+    status: str = "Active"
+    audit_block_hash: str = ""
+
+
+class ClinicalAnnotationCreateRequest(BaseModel):
+    """Payload to attach a clinical sticky-note or action-required flag."""
+
+    target_type: str  # document, medication, lab, alert, vaccination, condition
+    target_id: str
+    target_label: str
+    priority: str = "Clinical Note"  # Clinical Note, Action Required, Handoff Alert
+    body: str
+
+
+class ClinicalAnnotationOut(BaseModel):
+    """Clinical annotation attached to a specific clinical fact or document."""
+
+    id: str
+    patient_code: str
+    target_type: str
+    target_id: str
+    target_label: str
+    author_license_id: str
+    author_name: str
+    author_department: str
+    priority: str
+    body: str
+    created_at: str
+    resolved: bool = False
+
+
+class CareTeamMessageCreateRequest(BaseModel):
+    """Payload to send an inter-clinician handover or consult message."""
+
+    body: str
+    urgency: str = "Routine"  # Routine, Urgent, Critical
+    attached_ref: Optional[Dict[str, Any]] = None
+
+
+class CareTeamMessageOut(BaseModel):
+    """Handover or consult message exchanged among patient care team."""
+
+    id: str
+    patient_code: str
+    sender_license_id: str
+    sender_name: str
+    sender_role: str
+    sender_department: str
+    body: str
+    urgency: str
+    attached_ref: Optional[Dict[str, Any]] = None
+    created_at: str
+    acknowledged_by: List[str] = []

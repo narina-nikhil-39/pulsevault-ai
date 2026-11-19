@@ -16,6 +16,7 @@ import { SafetyView } from '../components/SafetyView'
 import { TimelineView } from '../components/TimelineView'
 import { ClinicalGraphView } from '../components/ClinicalGraphView'
 import { RagAssistantView } from '../components/RagAssistantView'
+import { ClinicianCollaborationPanel } from '../components/ClinicianCollaborationPanel'
 
 
 interface DoctorConsoleViewProps {
@@ -44,7 +45,7 @@ type DoctorSidebarNav =
   | 'safety'
   | 'consultations'
 
-type ClinicalTab = 'profile' | 'rag' | 'flashcard' | 'safety' | 'timeline' | 'graph' | 'audit'
+type ClinicalTab = 'profile' | 'rag' | 'flashcard' | 'safety' | 'timeline' | 'graph' | 'audit' | 'collaboration'
 
 const CLINICAL_TABS: { key: ClinicalTab; label: string; icon: string }[] = [
   { key: 'profile', label: 'Clinical Profile & Citations', icon: '📋' },
@@ -54,6 +55,7 @@ const CLINICAL_TABS: { key: ClinicalTab; label: string; icon: string }[] = [
   { key: 'timeline', label: 'Longitudinal Timeline', icon: '📅' },
   { key: 'graph', label: 'Knowledge Graph', icon: '🕸️' },
   { key: 'audit', label: 'Cryptographic Audit Chain', icon: '🔒' },
+  { key: 'collaboration', label: 'Care Team Collaboration & Handoff', icon: '🤝' },
 ]
 
 
@@ -947,6 +949,13 @@ export function DoctorConsoleView({
                         ) : null}
                         {clinicalTab === 'audit' ? (
                           <AuditView patientCode={profile.patient.patient_code} />
+                        ) : null}
+                        {clinicalTab === 'collaboration' ? (
+                          <ClinicianCollaborationPanel
+                            patientCode={profile.patient.patient_code}
+                            profile={profile}
+                            doctor={doctor}
+                          />
                         ) : null}
                       </div>
                     </>

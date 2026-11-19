@@ -58,6 +58,11 @@ from app.schemas import (
     AuditEventOut,
     BreakGlassRequest,
     BreakGlassResponse,
+    CareTeamMessageCreateRequest,
+    CareTeamMessageOut,
+    ClinicalAnnotationCreateRequest,
+    ClinicalAnnotationOut,
+    ClinicianDirectoryEntry,
     DoctorOut,
     GraphCypherResponse,
     GraphSubgraphResponse,
@@ -73,6 +78,8 @@ from app.schemas import (
     RagChunkOut,
     RagQueryRequest,
     RagQueryResponse,
+    RecordShareCreateRequest,
+    RecordShareGrantOut,
     SafetySimulateRequest,
     SafetySimulateResponse,
     UploadResponse,
@@ -97,6 +104,7 @@ from src.services.job_service import job_manager
 from src.services.neo4j_adapter import neo4j_adapter
 from src.services.ocr_service import sha256_of
 from src.services.rag_service import rag_service
+from src.services.collaboration_service import collaboration_service
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -964,6 +972,176 @@ def simulate_prospective_prescription(
     db.commit()
 
     return SafetySimulateResponse(**result)
+
+
+# =============================================================================
+# Clinician Collaboration, Consent Sharing & Care Team Messaging Endpoints
+# =============================================================================
+
+@app.get("/api/clinicians", response_model=List[ClinicianDirectoryEntry])
+def list_clinicians_directory(
+    db: Session = Depends(get_db),
+    doctor: AuthenticatedDoctor = Depends(require_standard_clinician),
+) -> List[ClinicianDirectoryEntry]:
+    """Retrieve verified clinicians across departments for collaboration and record sharing."""
+    entries = collaboration_service.list_clinicians(db)
+    return [ClinicianDirectoryEntry(**e) for e in entries]
+
+
+@app.get("/api/patients/{patient_code}/shares", response_model=List[RecordShareGrantOut])
+def list_patient_record_shares(
+    patient_code: str,
+    doctor: AuthenticatedDoctor = Depends(require_standard_clinician),
+) -> List[RecordShareGrantOut]:
+    """List active and historical time-bounded record sharing grants for this patient."""
+    shares = collaboration_service.list_shares(patient_code)
+    return [RecordShareGrantOut(**s) for s in shares]
+
+
+@app.post("/api/patients/{patient_code}/shares", response_model=RecordShareGrantOut)
+def create_patient_record_share(
+    patient_code: str,
+    payload: RecordShareCreateRequest,
+    db: Session = Depends(get_db),
+    doctor: AuthenticatedDoctor = Depends(require_standard_clinician),
+) -> RecordShareGrantOut:
+    """Create a cryptographically logged time-bounded record access grant for a consulting physician."""
+    clinicians = collaboration_service.list_clinicians(db)
+    recipient = next(
+        (c for c in clinicians if c["license_id"] == payload.shared_with_license_id),
+        {"license_id": payload.shared_with_license_id, "name": "Consulting Specialist", "department": "Clinical Consult"},
+    )
+    share = collaboration_service.create_share(
+        patient_code=patient_code,
+        actor_id=doctor.doctor_id,
+        actor_name=doctor.doctor_id,
+        recipient_doctor=recipient,
+        req=payload,
+    )
+    audit_logger.record(
+        db,
+        actor=doctor.doctor_id,
+        action="record.shared",
+        resource_type="patient",
+        resource_id=patient_code,
+        detail={"share_id": share["id"], "shared_with": recipient["license_id"], "audit_hash": share["audit_block_hash"]},
+    )
+    db.commit()
+    return RecordShareGrantOut(**share)
+
+
+@app.post("/api/patients/{patient_code}/shares/{share_id}/revoke", response_model=RecordShareGrantOut)
+def revoke_patient_record_share(
+    patient_code: str,
+    share_id: str,
+    db: Session = Depends(get_db),
+    doctor: AuthenticatedDoctor = Depends(require_standard_clinician),
+) -> RecordShareGrantOut:
+    """Revoke an active record access grant immediately."""
+    share = collaboration_service.revoke_share(patient_code, share_id)
+    if not share:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Share grant '{share_id}' not found.")
+    audit_logger.record(
+        db,
+        actor=doctor.doctor_id,
+        action="record.share_revoked",
+        resource_type="patient",
+        resource_id=patient_code,
+        detail={"share_id": share_id},
+    )
+    db.commit()
+    return RecordShareGrantOut(**share)
+
+
+@app.get("/api/patients/{patient_code}/annotations", response_model=List[ClinicalAnnotationOut])
+def list_patient_annotations(
+    patient_code: str,
+    doctor: AuthenticatedDoctor = Depends(require_standard_clinician),
+) -> List[ClinicalAnnotationOut]:
+    """Retrieve clinical entity annotations and flags attached to this patient record."""
+    annotations = collaboration_service.list_annotations(patient_code)
+    return [ClinicalAnnotationOut(**a) for a in annotations]
+
+
+@app.post("/api/patients/{patient_code}/annotations", response_model=ClinicalAnnotationOut)
+def create_patient_annotation(
+    patient_code: str,
+    payload: ClinicalAnnotationCreateRequest,
+    db: Session = Depends(get_db),
+    doctor: AuthenticatedDoctor = Depends(require_standard_clinician),
+) -> ClinicalAnnotationOut:
+    """Attach a clinical sticky-note, action required, or handoff alert to a specific medication or lab."""
+    ann = collaboration_service.create_annotation(
+        patient_code=patient_code,
+        actor_id=doctor.doctor_id,
+        actor_name=doctor.doctor_id,
+        actor_dept="Attending Clinical Team",
+        req=payload,
+    )
+    audit_logger.record(
+        db,
+        actor=doctor.doctor_id,
+        action="clinical.annotation_added",
+        resource_type="patient",
+        resource_id=patient_code,
+        detail={"annotation_id": ann["id"], "target_type": payload.target_type, "target_id": payload.target_id},
+    )
+    db.commit()
+    return ClinicalAnnotationOut(**ann)
+
+
+@app.post("/api/patients/{patient_code}/annotations/{ann_id}/toggle", response_model=ClinicalAnnotationOut)
+def toggle_patient_annotation(
+    patient_code: str,
+    ann_id: str,
+    doctor: AuthenticatedDoctor = Depends(require_standard_clinician),
+) -> ClinicalAnnotationOut:
+    """Toggle the resolved status of a clinical action item or note."""
+    ann = collaboration_service.toggle_annotation_resolved(patient_code, ann_id)
+    if not ann:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Annotation '{ann_id}' not found.")
+    return ClinicalAnnotationOut(**ann)
+
+
+@app.get("/api/patients/{patient_code}/messages", response_model=List[CareTeamMessageOut])
+def list_patient_messages(
+    patient_code: str,
+    doctor: AuthenticatedDoctor = Depends(require_standard_clinician),
+) -> List[CareTeamMessageOut]:
+    """Retrieve inter-clinician care team handover and consultation messages."""
+    messages = collaboration_service.list_messages(patient_code)
+    return [CareTeamMessageOut(**m) for m in messages]
+
+
+@app.post("/api/patients/{patient_code}/messages", response_model=CareTeamMessageOut)
+def send_patient_message(
+    patient_code: str,
+    payload: CareTeamMessageCreateRequest,
+    doctor: AuthenticatedDoctor = Depends(require_standard_clinician),
+) -> CareTeamMessageOut:
+    """Send an urgent handover or consult message regarding this patient."""
+    msg = collaboration_service.send_message(
+        patient_code=patient_code,
+        actor_id=doctor.doctor_id,
+        actor_name=doctor.doctor_id,
+        actor_role="Physician",
+        actor_dept="Primary Attending",
+        req=payload,
+    )
+    return CareTeamMessageOut(**msg)
+
+
+@app.post("/api/patients/{patient_code}/messages/{msg_id}/ack", response_model=CareTeamMessageOut)
+def acknowledge_patient_message(
+    patient_code: str,
+    msg_id: str,
+    doctor: AuthenticatedDoctor = Depends(require_standard_clinician),
+) -> CareTeamMessageOut:
+    """Mark a care team consult message as acknowledged by the current clinician."""
+    msg = collaboration_service.ack_message(patient_code, msg_id, doctor.doctor_id)
+    if not msg:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Message '{msg_id}' not found.")
+    return CareTeamMessageOut(**msg)
 
 
 
