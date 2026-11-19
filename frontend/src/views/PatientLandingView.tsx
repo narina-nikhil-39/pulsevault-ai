@@ -11,6 +11,7 @@ import {
 import { AsyncProgressTracker } from '../components/AsyncProgressTracker'
 import { PatientRegisterWizard } from '../components/PatientRegisterWizard'
 import { WalletQrCard } from '../components/WalletQrCard'
+import { FamilyHealthLocker } from '../components/FamilyHealthLocker'
 
 
 interface PatientLandingViewProps {
@@ -40,12 +41,16 @@ export function PatientLandingView({
   onBookAppointmentRedirect,
   onNavigateHome,
 }: PatientLandingViewProps) {
-  const [patients, setPatients] = useState<PortalPatientSummary[]>([])
-  const [selectedCode, setSelectedCode] = useState<string>('SYN123456')
+  const [_patients, setPatients] = useState<PortalPatientSummary[]>([])
+  const [selectedCode, setSelectedCode] = useState<string>(() => {
+    return localStorage.getItem('synapsehealth.current_patient_code') || 'OPD-ARJUN'
+  })
   const [profile, setProfile] = useState<PatientProfile | null>(null)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'locker' | 'voice' | 'triage'>('locker')
+  const [activeTab, setActiveTab] = useState<'locker' | 'family' | 'voice' | 'triage'>('locker')
   const [showRegisterWizard, setShowRegisterWizard] = useState(false)
+  const [showSwitchModal, setShowSwitchModal] = useState(false)
+  const [switchInputCode, setSwitchInputCode] = useState('')
 
   // Document Upload State
   const [uploading, setUploading] = useState(false)
@@ -117,13 +122,19 @@ export function PatientLandingView({
   useEffect(() => {
     async function loadPatients() {
       try {
+        const savedCode = localStorage.getItem('synapsehealth.current_patient_code')
         const list = await fetchPortalPatients()
         setPatients(list)
-        if (list.length > 0) {
+        if (savedCode && list.some((p) => p.patient_code === savedCode)) {
+          setSelectedCode(savedCode)
+        } else if (list.length > 0) {
           const defaultPatient =
-            list.find((p) => p.patient_code === 'SYN123456') || list[0]
+            list.find((p) => p.patient_code === 'OPD-ARJUN') ||
+            list.find((p) => p.patient_code === 'SYN123456') ||
+            list[0]
           if (defaultPatient) {
             setSelectedCode(defaultPatient.patient_code)
+            localStorage.setItem('synapsehealth.current_patient_code', defaultPatient.patient_code)
           }
         }
       } catch (err) {
@@ -135,6 +146,7 @@ export function PatientLandingView({
 
   useEffect(() => {
     if (!selectedCode) return
+    localStorage.setItem('synapsehealth.current_patient_code', selectedCode)
     let active = true
     setLoading(true)
     fetchPortalProfile(selectedCode)
@@ -522,20 +534,39 @@ export function PatientLandingView({
               </button>
             </div>
 
-            {/* Quick Demo Selector */}
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span className="text-slate-400">Active Patient Profile:</span>
-              <select
-                value={selectedCode}
-                onChange={(e) => setSelectedCode(e.target.value)}
-                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:border-emerald-500"
-              >
-                {patients.map((p) => (
-                  <option key={p.patient_code} value={p.patient_code}>
-                    {p.full_name} ({p.patient_code})
-                  </option>
-                ))}
-              </select>
+            {/* Authenticated Patient Session Strip (Strict Single-Patient Privacy) */}
+            <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold text-sm shadow-xs">
+                  👤
+                </span>
+                <div>
+                  <div className="font-bold text-slate-900 flex items-center gap-2">
+                    <span>{patient?.full_name || 'Authenticated Patient'}</span>
+                    <span className="rounded bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold px-2 py-0.5">
+                      {patient?.patient_code}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-500 font-mono">
+                    ABHA Verified Account • Private Health Sandbox
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowSwitchModal(true)}
+                  className="rounded-xl border border-slate-300 hover:bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition cursor-pointer"
+                >
+                  Switch Patient ID
+                </button>
+                <button
+                  onClick={() => setShowRegisterWizard(true)}
+                  className="rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white transition cursor-pointer shadow-xs"
+                >
+                  + Enroll New Patient
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -547,7 +578,7 @@ export function PatientLandingView({
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab('locker')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
                 activeTab === 'locker'
                   ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
@@ -556,8 +587,18 @@ export function PatientLandingView({
               📁 Personal Health Locker
             </button>
             <button
+              onClick={() => setActiveTab('family')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                activeTab === 'family'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              👨‍👩‍👧‍👦 Family Health Details
+            </button>
+            <button
               onClick={() => setActiveTab('voice')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
                 activeTab === 'voice'
                   ? 'bg-emerald-600 text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
@@ -567,7 +608,7 @@ export function PatientLandingView({
             </button>
             <button
               onClick={() => setActiveTab('triage')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
                 activeTab === 'triage'
                   ? 'bg-purple-600 text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100'
@@ -756,7 +797,18 @@ export function PatientLandingView({
           </div>
         ) : null}
 
-        {/* TAB 2: ACCESSIBLE VOICE & TEXT ASSISTANT */}
+        {/* TAB 2: FAMILY HEALTH DETAILS */}
+        {activeTab === 'family' ? (
+          patient ? (
+            <FamilyHealthLocker primaryPatient={patient} />
+          ) : (
+            <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-xs text-slate-500">
+              Loading family health profile...
+            </div>
+          )
+        ) : null}
+
+        {/* TAB 3: ACCESSIBLE VOICE & TEXT ASSISTANT */}
         {activeTab === 'voice' ? (
           <div className="max-w-2xl mx-auto rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden flex flex-col h-[520px]">
             <div className="border-b border-slate-100 p-4 flex items-center justify-between">
@@ -1010,6 +1062,71 @@ export function PatientLandingView({
               if (onSwitchPersona) onSwitchPersona('doctor')
             }}
           />
+        </div>
+      )}
+
+      {/* Switch Patient Health ID Modal */}
+      {showSwitchModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🔐</span>
+                <h3 className="text-sm font-black text-slate-900">Access Personal Health Locker</h3>
+              </div>
+              <button
+                onClick={() => setShowSwitchModal(false)}
+                className="text-slate-400 hover:text-slate-600 font-bold text-lg cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Enter your ABHA Health ID or Patient Registration Code to unlock your private medical records and family dependents.
+            </p>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                const code = switchInputCode.trim().toUpperCase()
+                if (code) {
+                  setSelectedCode(code)
+                  setShowSwitchModal(false)
+                  setSwitchInputCode('')
+                }
+              }}
+              className="space-y-3.5 text-xs"
+            >
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Health ID / Patient Code</label>
+                <input
+                  type="text"
+                  required
+                  value={switchInputCode}
+                  onChange={(e) => setSwitchInputCode(e.target.value)}
+                  placeholder="e.g. OPD-ARJUN, SYN123456"
+                  className="w-full rounded-xl border border-slate-300 p-2.5 font-mono uppercase font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
+                />
+              </div>
+
+              <div className="pt-2 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowSwitchModal(false)}
+                  className="flex-1 rounded-xl border border-slate-300 py-2.5 font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 py-2.5 font-bold text-white transition cursor-pointer shadow-xs"
+                >
+                  Access Record
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
