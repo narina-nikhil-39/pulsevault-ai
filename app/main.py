@@ -1177,29 +1177,28 @@ def portal_login(
     patient = None
 
     if code_query:
-        patient = db.scalar(
-            select(Patient).where(
-                or_(
-                    Patient.patient_code == code_query,
-                    Patient.patient_code == code_query.upper(),
-                    Patient.contact == code_query,
-                    Patient.contact.ilike(f"%{code_query}%"),
-                    Patient.full_name.ilike(f"%{code_query}%"),
-                    Patient.patient_code.ilike(f"%{code_query}%"),
-                )
-            )
-        )
+        digits_only = "".join(filter(str.isdigit, code_query))
+        syn_hyphen = f"SYN-{digits_only}" if digits_only else ""
+        syn_plain = f"SYN{digits_only}" if digits_only else ""
 
-    # If code_query is a numeric code (e.g. 1024, 1234), search within patient code or contact
-    if not patient and code_query.isdigit():
-        patient = db.scalar(
-            select(Patient).where(
-                or_(
-                    Patient.patient_code.ilike(f"%{code_query}%"),
-                    Patient.contact.ilike(f"%{code_query}%"),
-                )
-            )
-        )
+        match_conditions = [
+            Patient.patient_code == code_query,
+            Patient.patient_code == code_query.upper(),
+            Patient.contact == code_query,
+            Patient.contact.ilike(f"%{code_query}%"),
+            Patient.full_name.ilike(f"%{code_query}%"),
+            Patient.patient_code.ilike(f"%{code_query}%"),
+        ]
+        if syn_hyphen:
+            match_conditions.extend([
+                Patient.patient_code == syn_hyphen,
+                Patient.patient_code == syn_plain,
+                Patient.patient_code.ilike(f"%{digits_only}%"),
+            ])
+        if len(digits_only) >= 4:
+            match_conditions.append(Patient.contact.ilike(f"%{digits_only}%"))
+
+        patient = db.scalar(select(Patient).where(or_(*match_conditions)))
 
     # Fallback to demo patient if '1234' or empty was passed
     if not patient and (code_query in ("1234", "DEMO", "") or not code_query):
@@ -1323,7 +1322,24 @@ def portal_patient_profile(
     db: Session = Depends(get_db),
 ) -> Dict[str, Any]:
     """Retrieve patient health locker profile without clinician credentials."""
-    patient = db.scalar(select(Patient).where(Patient.patient_code == patient_code))
+    clean_code = patient_code.strip()
+    digits_only = "".join(filter(str.isdigit, clean_code))
+    syn_hyphen = f"SYN-{digits_only}" if digits_only else ""
+    syn_plain = f"SYN{digits_only}" if digits_only else ""
+
+    match_conditions = [
+        Patient.patient_code == clean_code,
+        Patient.patient_code == clean_code.upper(),
+        Patient.patient_code.ilike(clean_code),
+    ]
+    if syn_hyphen:
+        match_conditions.extend([
+            Patient.patient_code == syn_hyphen,
+            Patient.patient_code == syn_plain,
+            Patient.patient_code.ilike(f"%{digits_only}%"),
+        ])
+
+    patient = db.scalar(select(Patient).where(or_(*match_conditions)))
     if patient is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found.")
     return patient_service.build_profile(db, patient)
