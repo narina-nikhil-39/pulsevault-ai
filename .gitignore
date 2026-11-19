@@ -48,6 +48,8 @@ archify_output/
 *.db
 *.db-journal
 *.db-shm
+.matplotlib/
+data/.matplotlib/
 *.db-wal
 *.sqlite
 *.sqlite3

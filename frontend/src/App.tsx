@@ -13,6 +13,8 @@ import { DoctorConsoleView } from './views/DoctorConsoleView'
 import { PatientLandingView } from './views/PatientLandingView'
 import { ReceptionDeskView } from './views/ReceptionDeskView'
 import { PortalDirectoryView } from './views/PortalDirectoryView'
+import { UniversalAppHeader } from './components/UniversalAppHeader'
+import { BenchmarkDashboardView } from './views/BenchmarkDashboardView'
 
 interface Doctor {
   doctor_id: string
@@ -20,7 +22,7 @@ interface Doctor {
   role: string
 }
 
-export type AppRoute = 'directory' | 'reception' | 'doctor' | 'patient'
+export type AppRoute = 'directory' | 'reception' | 'doctor' | 'patient' | 'benchmarks'
 
 function getInitialRoute(): AppRoute {
   if (typeof window === 'undefined') return 'directory'
@@ -28,6 +30,7 @@ function getInitialRoute(): AppRoute {
   if (path.startsWith('/reception')) return 'reception'
   if (path.startsWith('/doctor')) return 'doctor'
   if (path.startsWith('/patient')) return 'patient'
+  if (path.startsWith('/benchmarks')) return 'benchmarks'
   return 'directory'
 }
 
@@ -68,6 +71,8 @@ function ClinicalWorkspace() {
       url = code ? `/doctor?patient=${encodeURIComponent(code)}` : '/doctor'
     } else if (nextRoute === 'patient') {
       url = code ? `/patient?patient=${encodeURIComponent(code)}` : '/patient'
+    } else if (nextRoute === 'benchmarks') {
+      url = '/benchmarks'
     }
 
     if (code) {
@@ -119,37 +124,74 @@ function ClinicalWorkspace() {
     }
   }, [doctor, patientCode, profile, loadProfile])
 
+  // ROUTE 4: Live Benchmark & Metrics Dashboard (/benchmarks)
+  if (route === 'benchmarks') {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
+        <UniversalAppHeader
+          currentRoute={route}
+          onNavigate={(dest, code) => navigate(dest, code)}
+          currentPatientCode={patientCode}
+        />
+        <main className="flex-1">
+          <BenchmarkDashboardView />
+        </main>
+      </div>
+    )
+  }
+
   // ROUTE 0: Central Hospital Gateway & Directory (/)
   if (route === 'directory') {
     return (
-      <PortalDirectoryView
-        onNavigate={(dest, code) => navigate(dest, code)}
-      />
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
+        <UniversalAppHeader
+          currentRoute={route}
+          onNavigate={(dest, code) => navigate(dest, code)}
+          currentPatientCode={patientCode}
+        />
+        <PortalDirectoryView
+          onNavigate={(dest, code) => navigate(dest, code)}
+        />
+      </div>
     )
   }
 
   // ROUTE 1: Reception Desk & Triage (/reception)
   if (route === 'reception') {
     return (
-      <ReceptionDeskView
-        persona="reception"
-        onSwitchPersona={(p) => navigate(p)}
-        onNavigateHome={() => navigate('directory')}
-        onSelectPatientForDoctor={(code) => navigate('doctor', code)}
-        onOpenPatientPortal={(code) => navigate('patient', code)}
-      />
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
+        <UniversalAppHeader
+          currentRoute={route}
+          onNavigate={(dest, code) => navigate(dest, code)}
+          currentPatientCode={patientCode}
+        />
+        <ReceptionDeskView
+          persona="reception"
+          onSwitchPersona={(p) => navigate(p)}
+          onNavigateHome={() => navigate('directory')}
+          onSelectPatientForDoctor={(code) => navigate('doctor', code)}
+          onOpenPatientPortal={(code) => navigate('patient', code)}
+        />
+      </div>
     )
   }
 
   // ROUTE 3: Patient Health Locker (/patient)
   if (route === 'patient') {
     return (
-      <PatientLandingView
-        persona="patient"
-        onSwitchPersona={(p) => navigate(p)}
-        onNavigateHome={() => navigate('directory')}
-        onBookAppointmentRedirect={() => navigate('reception')}
-      />
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
+        <UniversalAppHeader
+          currentRoute={route}
+          onNavigate={(dest, code) => navigate(dest, code)}
+          currentPatientCode={patientCode}
+        />
+        <PatientLandingView
+          persona="patient"
+          onSwitchPersona={(p) => navigate(p)}
+          onNavigateHome={() => navigate('directory')}
+          onBookAppointmentRedirect={() => navigate('reception')}
+        />
+      </div>
     )
   }
 
@@ -183,17 +225,24 @@ function ClinicalWorkspace() {
   }
 
   return (
-    <DoctorConsoleView
-      doctor={doctor}
-      patientCode={patientCode}
-      profile={profile}
-      loading={loading}
-      onSelectPatient={handleSelect}
-      onSignOut={handleSignOut}
-      persona="doctor"
-      onSwitchPersona={(p) => navigate(p)}
-      onNavigateHome={() => navigate('directory')}
-    />
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
+      <UniversalAppHeader
+        currentRoute={route}
+        onNavigate={(dest, code) => navigate(dest, code)}
+        currentPatientCode={patientCode}
+      />
+      <DoctorConsoleView
+        doctor={doctor}
+        patientCode={patientCode}
+        profile={profile}
+        loading={loading}
+        onSelectPatient={handleSelect}
+        onSignOut={handleSignOut}
+        persona="doctor"
+        onSwitchPersona={(p) => navigate(p)}
+        onNavigateHome={() => navigate('directory')}
+      />
+    </div>
   )
 }
 

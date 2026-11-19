@@ -153,6 +153,12 @@ pipeline = ClinicalIngestionPipeline(patient_service=patient_service)
 audit_logger = AuditLogger()
 fhir_service = FHIRService()
 
+from fastapi.staticfiles import StaticFiles
+
+_PAPER_DIR = Path(__file__).resolve().parent.parent / "paper"
+if _PAPER_DIR.exists():
+    app.mount("/paper", StaticFiles(directory=str(_PAPER_DIR)), name="paper")
+
 _ALLOWED_SUFFIXES = (".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff", ".webp")
 _MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 

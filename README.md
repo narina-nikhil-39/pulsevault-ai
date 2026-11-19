@@ -1,15 +1,20 @@
 # SynapseHealth (PulseVault AI) — Enterprise Clinical Intelligence Platform
 
+[![CI/CD](https://github.com/narina-nikhil-39/pulsevault-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/narina-nikhil-39/pulsevault-ai/actions)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg)](https://fastapi.tiangolo.com/)
-[![React](https://img.shields.io/badge/React-18%2B-61DAFB.svg)](https://react.dev/)
+[![React](https://img.shields.io/badge/React-19-61DAFB.svg)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-3178C6.svg)](https://www.typescriptlang.org/)
 [![Qdrant](https://img.shields.io/badge/Qdrant-1.11-red.svg)](https://qdrant.tech/)
 [![Neo4j](https://img.shields.io/badge/Neo4j-5.23-008CC1.svg)](https://neo4j.com/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-97%20Passed-brightgreen.svg)]()
+[![Paper PDF](https://img.shields.io/badge/IEEE%20JBHI-Paper%20PDF-purple.svg)](paper/pulsevault_ai_ieee_jbhi.pdf)
 
 **SynapseHealth (PulseVault AI)** is an enterprise multimodal clinical intelligence architecture engineered to eliminate adverse drug events (ADEs), reconcile fragmented longitudinal patient records across hospitals, and deliver precomputed, coordinate-grounded emergency flashcards in **under 1.5 seconds**.
+
+> **Pre-compiled Research Paper**: Download the camera-ready IEEE double-column manuscript: [`paper/pulsevault_ai_ieee_jbhi.pdf`](paper/pulsevault_ai_ieee_jbhi.pdf)  
+> **1-Click Clinical Demo**: Run `.\start_demo.ps1` (PowerShell) or double-click `start_demo.bat` to launch the full system and browser automatically.
 
 ---
 
