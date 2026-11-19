@@ -28,12 +28,12 @@ export function UniversalAppHeader({
             onClick={() => onNavigate('directory')}
             className="flex items-center gap-2 text-left group cursor-pointer"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-sm shadow-sm shadow-blue-500/20 group-hover:scale-105 transition-transform">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#064e3b] text-white font-black text-sm shadow-sm shadow-emerald-950/20 group-hover:scale-105 transition-transform">
               P
             </div>
             <div>
-              <div className="text-xs font-black tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
-                PULSEVAULT AI <span className="text-[10px] font-bold text-blue-600">PRO</span>
+              <div className="text-xs font-black tracking-tight text-slate-900 group-hover:text-[#064e3b] transition-colors">
+                PULSEVAULT AI <span className="text-[10px] font-bold text-[#064e3b]">PRO</span>
               </div>
               <div className="text-[10px] text-slate-400 font-medium">SynapseHealth Clinical OS</div>
             </div>
@@ -51,7 +51,7 @@ export function UniversalAppHeader({
             onClick={() => onNavigate('doctor', currentPatientCode || 'OPD-ARJUN')}
             className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 transition cursor-pointer ${
               currentRoute === 'doctor'
-                ? 'bg-white text-blue-700 shadow-2xs font-extrabold'
+                ? 'bg-white text-[#064e3b] shadow-2xs font-extrabold'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -63,7 +63,7 @@ export function UniversalAppHeader({
             onClick={() => onNavigate('patient', currentPatientCode || 'OPD-ARJUN')}
             className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 transition cursor-pointer ${
               currentRoute === 'patient'
-                ? 'bg-white text-blue-700 shadow-2xs font-extrabold'
+                ? 'bg-white text-[#064e3b] shadow-2xs font-extrabold'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -87,7 +87,7 @@ export function UniversalAppHeader({
             onClick={() => onNavigate('benchmarks')}
             className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 transition cursor-pointer ${
               currentRoute === 'benchmarks'
-                ? 'bg-white text-indigo-700 shadow-2xs font-extrabold'
+                ? 'bg-white text-[#064e3b] shadow-2xs font-extrabold'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >

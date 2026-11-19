@@ -19,6 +19,18 @@ import { AsyncProgressTracker } from '../components/AsyncProgressTracker'
 import { PatientRegisterWizard } from '../components/PatientRegisterWizard'
 import { WalletQrCard } from '../components/WalletQrCard'
 import { FamilyHealthLocker } from '../components/FamilyHealthLocker'
+import {
+  DoctorTeamLeftIllustration,
+  DoctorTeamRightIllustration,
+  CardiacVectorIcon,
+  DiabetesVectorIcon,
+  StomachVectorIcon,
+  PainReliefVectorIcon,
+  RespiratoryVectorIcon,
+  NeurologyVectorIcon,
+  ElderlyCareVectorIcon,
+  ColdImmunityVectorIcon,
+} from '../components/FlatVectorHealthcareIllustrations'
 
 
 interface PatientLandingViewProps {
@@ -59,6 +71,9 @@ export function PatientLandingView({
   const [showSwitchModal, setShowSwitchModal] = useState(false)
   const [switchInputCode, setSwitchInputCode] = useState('')
   const [switchPinInput, setSwitchPinInput] = useState('1234')
+
+  const [heroSearchQuery, setHeroSearchQuery] = useState('')
+  const heroFileInputRef = useRef<HTMLInputElement>(null)
 
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -472,57 +487,132 @@ export function PatientLandingView({
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
-      {/* 1. Header matching Image 1 MediCare Pro */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200/80 px-7 py-3.5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* Brand Logo */}
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-md shadow-emerald-500/20">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.4}
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
+      {/* Hidden File Input for Direct Hero Upload */}
+      <input
+        ref={heroFileInputRef}
+        type="file"
+        className="hidden"
+        onChange={handleFileUpload}
+        accept=".pdf,image/*"
+      />
+
+      {/* 1. Top Navbar (Apollo Pharmacy / MediCare Pro Style - Clean White + Dark Green Brand) */}
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200/90 px-6 py-3">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+          {/* Brand Logo & Location */}
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#064e3b] text-white shadow-md shadow-emerald-950/20">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.4}
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <span className="text-lg font-black text-[#064e3b] tracking-tight">MediCare Pro</span>
+                <span className="text-[10px] text-slate-400 font-semibold ml-1.5 hidden sm:inline">
+                  Pharmacy &amp; Health Locker
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="text-lg font-black text-slate-900 tracking-tight">MediCare Pro</span>
-              <span className="text-[10px] text-slate-400 font-medium ml-2 hidden sm:inline">
-                by SynapseHealth
-              </span>
+
+            {/* Care Location Selector */}
+            <div className="hidden md:flex items-center gap-2 text-xs text-slate-600 border-l border-slate-200 pl-5">
+              <span className="text-slate-400">📍 Care Site:</span>
+              <button
+                type="button"
+                className="font-bold text-slate-800 hover:text-[#064e3b] flex items-center gap-1 cursor-pointer"
+              >
+                <span>Central Hospital • Metro Wing</span>
+                <span className="text-[10px] text-slate-400">▾</span>
+              </button>
             </div>
           </div>
 
-          {/* Decoupled Hospital Navigation */}
-          <div className="flex items-center gap-2.5">
-            {onNavigateHome && (
-              <button
-                onClick={onNavigateHome}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 transition"
-              >
-                <span>←</span>
-                <span>Hospital Directory</span>
-              </button>
-            )}
+          {/* Center Category Navigation */}
+          <div className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-600">
             <button
-              onClick={() => setShowRegisterWizard(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition"
+              onClick={() => setActiveTab('locker')}
+              className={`pb-1 border-b-2 transition cursor-pointer ${
+                activeTab === 'locker'
+                  ? 'border-[#064e3b] text-[#064e3b]'
+                  : 'border-transparent hover:text-[#064e3b]'
+              }`}
             >
-              <span>+</span>
-              <span>Register New Patient</span>
+              Buy Medicines &amp; Records
+            </button>
+            <button
+              onClick={() => {
+                if (onSwitchPersona) onSwitchPersona('doctor')
+              }}
+              className="pb-1 border-b-2 border-transparent hover:border-[#064e3b] hover:text-[#064e3b] transition cursor-pointer"
+            >
+              Find Doctors
+            </button>
+            <button
+              onClick={() => setActiveTab('locker')}
+              className="pb-1 border-b-2 border-transparent hover:border-[#064e3b] hover:text-[#064e3b] transition cursor-pointer"
+            >
+              Lab Tests
+            </button>
+            <button
+              onClick={() => setActiveTab('family')}
+              className={`pb-1 border-b-2 transition cursor-pointer ${
+                activeTab === 'family'
+                  ? 'border-[#064e3b] text-[#064e3b]'
+                  : 'border-transparent hover:text-[#064e3b]'
+              }`}
+            >
+              Family Health <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full font-bold ml-1">New</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('triage')}
+              className={`pb-1 border-b-2 transition cursor-pointer ${
+                activeTab === 'triage'
+                  ? 'border-[#064e3b] text-[#064e3b]'
+                  : 'border-transparent hover:text-[#064e3b]'
+              }`}
+            >
+              Symptom Triage
             </button>
           </div>
 
           {/* Right Header Navigation & Actions */}
-          <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-5 text-xs font-semibold text-slate-600">
-              <span className="text-emerald-600 font-bold cursor-pointer">Home</span>
-              <span className="hover:text-slate-900 cursor-pointer">About</span>
-              <span className="hover:text-slate-900 cursor-pointer">Services</span>
-              <span className="hover:text-slate-900 cursor-pointer">Contact</span>
-            </div>
+          <div className="flex items-center gap-3">
+            {onNavigateHome && (
+              <button
+                onClick={onNavigateHome}
+                className="hidden sm:flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 transition cursor-pointer"
+              >
+                <span>←</span>
+                <span>Hospital OS</span>
+              </button>
+            )}
+
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-700 hover:bg-rose-100 transition cursor-pointer"
+              >
+                <span>🔒</span>
+                <span>Sign Out ({patient?.patient_code || authUser?.patient_code})</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  const el = document.getElementById('patient-auth-section')
+                  if (el) el.scrollIntoView({ behavior: 'smooth' })
+                }}
+                className="flex items-center gap-1.5 rounded-xl border border-[#064e3b] bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-[#064e3b] hover:bg-emerald-100 transition cursor-pointer"
+              >
+                <span>👤</span>
+                <span>Login / Unlock</span>
+              </button>
+            )}
 
             <button
               onClick={() => {
@@ -532,158 +622,480 @@ export function PatientLandingView({
                   onSwitchPersona('reception')
                 }
               }}
-              className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-5 py-2 text-xs font-bold text-white shadow-sm shadow-emerald-500/20 transition"
+              className="rounded-full bg-[#064e3b] hover:bg-[#053b2e] px-4 py-2 text-xs font-bold text-white shadow-sm shadow-emerald-950/20 transition cursor-pointer"
             >
-              Book an Appointment
+              Book Appointment
             </button>
           </div>
         </div>
       </header>
 
-      {/* 2. Hero Section matching Image 1 */}
-      <section className="bg-gradient-to-b from-sky-50/60 via-[#F8FAFC] to-white py-12 px-7 border-b border-slate-100">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
-          {/* Left Side: Healthcare Consultation Illustration Card */}
-          <div className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-100 bg-gradient-to-br from-blue-600 via-teal-600 to-emerald-600 p-1">
-            <div className="rounded-[22px] bg-white p-8 flex flex-col justify-between min-h-[380px] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-100/40 rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none" />
+      {/* 2. Dark Green Sub-Header Navigation Strip (Apollo Pharmacy Style) */}
+      <div className="bg-[#072e26] text-slate-200 px-6 py-2 border-b border-[#041f1a] text-xs font-semibold overflow-x-auto">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-6 whitespace-nowrap">
+          <div className="flex items-center gap-6">
+            <span className="text-emerald-400 font-bold cursor-pointer">MediCare Products</span>
+            <span className="hover:text-white transition cursor-pointer" onClick={() => setActiveTab('locker')}>Prescriptions &amp; Ingestion</span>
+            <span className="hover:text-white transition cursor-pointer" onClick={() => setActiveTab('locker')}>Cardiology &amp; Anticoagulants</span>
+            <span className="hover:text-white transition cursor-pointer" onClick={() => setActiveTab('locker')}>Diabetes &amp; Metabolic Care</span>
+            <span className="hover:text-white transition cursor-pointer" onClick={() => setActiveTab('family')}>Family Dependent Profiles</span>
+            <span className="hover:text-white transition cursor-pointer" onClick={() => setActiveTab('triage')}>Emergency Triage 24/7</span>
+            <span className="hover:text-white transition cursor-pointer" onClick={() => setActiveTab('voice')}>AI Medical Companion</span>
+          </div>
+          <span className="text-[11px] text-emerald-300 font-mono hidden md:inline">
+            ✓ 100% Zero-Hallucination Verified
+          </span>
+        </div>
+      </div>
 
-              <div className="flex items-center justify-between relative z-10">
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
-                  ✓ Accredited Hospital Care
-                </span>
-                <span className="text-xs font-mono text-slate-400">24/7 Digital Intake</span>
-              </div>
+      {/* 3. Hero Section with Custom Flat Vector Healthcare Illustrations (Dark Green & White Combo) */}
+      <section className="bg-gradient-to-r from-[#06382f] via-[#09483c] to-[#06382f] text-white pt-8 pb-10 px-6 shadow-xl relative overflow-hidden">
+        {/* Ambient background glow dots */}
+        <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
 
-              <div className="py-8 relative z-10 text-center">
-                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 text-5xl shadow-sm mb-4">
-                  👩‍⚕️
-                </div>
-                <h3 className="text-xl font-bold text-slate-900">Dr. Priya Mehta &amp; Team</h3>
-                <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                  Connected to verified SynapseHealth clinical exchange and national ABHA registries.
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between text-xs border-t border-slate-100 pt-4 relative z-10">
-                <div className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  <span className="font-semibold text-slate-700">Online Triage Ready</span>
-                </div>
-                <span className="text-slate-400">Average wait time: &lt; 15 mins</span>
-              </div>
-            </div>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+          {/* Left Column: Flat Vector Doctor Team Illustration */}
+          <div className="hidden lg:flex lg:col-span-3 justify-center items-center">
+            <DoctorTeamLeftIllustration className="w-full max-h-56 object-contain drop-shadow-md" />
           </div>
 
-          {/* Right Side: Elevated Welcome Card matching Screenshot 1 */}
-          <div className="rounded-3xl border border-slate-200/80 bg-white p-8 lg:p-10 shadow-xl space-y-6">
-            <div className="inline-block rounded-full bg-sky-50 px-3.5 py-1 text-[11px] font-bold text-sky-700 border border-sky-200 tracking-wide">
-              WELCOME TO MEDICARE PRO
-            </div>
-
-            <h1 className="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-              Convenient Healthcare at Your Fingertips
+          {/* Center Column: Clean White Title, Search Bar & Quick Tags */}
+          <div className="lg:col-span-6 text-center space-y-4">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+              Buy Medicines and Health Essentials
             </h1>
-
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Experience top-tier medical care from our state-of-the-art facility or from the comfort
-              of your home. We prioritize your well-being with personalized, compassionate care
-              tailored to your unique needs.
+            <p className="text-xs sm:text-sm text-emerald-100 max-w-lg mx-auto font-medium">
+              Consult board-certified clinicians, ingest medical records with OCR, and access your encrypted personal health locker.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <button
-                onClick={() => {
-                  if (onBookAppointmentRedirect) {
-                    onBookAppointmentRedirect()
-                  } else if (onSwitchPersona) {
-                    onSwitchPersona('reception')
-                  }
-                }}
-                className="rounded-full bg-emerald-500 hover:bg-emerald-600 px-6 py-3 text-xs font-bold text-white shadow-md shadow-emerald-500/25 transition"
-              >
-                Book an Appointment
-              </button>
+            {/* Clean White Rounded Search Bar Pill */}
+            <div className="max-w-xl mx-auto pt-1">
+              <div className="relative flex items-center rounded-2xl bg-white shadow-xl shadow-emerald-950/30 p-1.5 border border-white">
+                <div className="pl-3.5 pr-2 text-slate-400">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.4}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  value={heroSearchQuery}
+                  onChange={(e) => setHeroSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && heroSearchQuery.trim()) {
+                      handleUserQuery(heroSearchQuery)
+                      setActiveTab('voice')
+                    }
+                  }}
+                  placeholder="Search Medicines, Prescriptions, Lab Reports or Health Records..."
+                  className="w-full bg-transparent py-2.5 px-2 text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none"
+                />
+                {heroSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setHeroSearchQuery('')}
+                    className="p-1.5 text-slate-400 hover:text-slate-600 font-bold text-xs mr-1 cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (heroSearchQuery.trim()) {
+                      handleUserQuery(heroSearchQuery)
+                      setActiveTab('voice')
+                    } else {
+                      setActiveTab('locker')
+                    }
+                  }}
+                  className="rounded-xl bg-[#064e3b] hover:bg-[#053b2e] px-4 py-2 text-xs font-bold text-white transition cursor-pointer shadow-sm"
+                >
+                  Search
+                </button>
+              </div>
 
-              <button
-                onClick={() => setActiveTab('locker')}
-                className="rounded-full border border-slate-300 bg-white hover:bg-slate-50 px-6 py-3 text-xs font-bold text-slate-700 transition"
-              >
-                Access Health Locker
-              </button>
+              {/* Popular Search Suggestions */}
+              <div className="pt-2 flex flex-wrap items-center justify-center gap-1.5 text-[11px] text-emerald-200">
+                <span className="font-semibold text-white">Popular:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHeroSearchQuery('Warfarin')
+                    handleUserQuery('Warfarin')
+                    setActiveTab('voice')
+                  }}
+                  className="rounded-full bg-emerald-900/60 hover:bg-emerald-800 px-2.5 py-0.5 text-emerald-100 border border-emerald-700/60 transition cursor-pointer"
+                >
+                  Warfarin 5mg
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHeroSearchQuery('Aspirin')
+                    handleUserQuery('Aspirin')
+                    setActiveTab('voice')
+                  }}
+                  className="rounded-full bg-emerald-900/60 hover:bg-emerald-800 px-2.5 py-0.5 text-emerald-100 border border-emerald-700/60 transition cursor-pointer"
+                >
+                  Aspirin 325mg
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHeroSearchQuery('Albuterol')
+                    handleUserQuery('Albuterol')
+                    setActiveTab('voice')
+                  }}
+                  className="rounded-full bg-emerald-900/60 hover:bg-emerald-800 px-2.5 py-0.5 text-emerald-100 border border-emerald-700/60 transition cursor-pointer"
+                >
+                  Albuterol 90mcg
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHeroSearchQuery('Metformin')
+                    handleUserQuery('Metformin')
+                    setActiveTab('voice')
+                  }}
+                  className="rounded-full bg-emerald-900/60 hover:bg-emerald-800 px-2.5 py-0.5 text-emerald-100 border border-emerald-700/60 transition cursor-pointer"
+                >
+                  Metformin 500mg
+                </button>
+              </div>
             </div>
 
-            {/* Patient Session Strip */}
-            <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+            {/* Authenticated Patient Session Strip inside Hero */}
+            <div className="pt-3 max-w-xl mx-auto">
               {isAuthenticated ? (
-                <>
-                  <div className="flex items-center gap-2.5">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold text-sm shadow-xs">
+                <div className="rounded-2xl bg-emerald-950/80 border border-emerald-800/80 p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5 text-left">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500 text-white font-bold text-sm shadow-xs">
                       👤
                     </span>
                     <div>
-                      <div className="font-bold text-slate-900 flex items-center gap-2">
+                      <div className="font-bold text-white flex items-center gap-2">
                         <span>{patient?.full_name || authUser?.full_name || 'Authenticated Patient'}</span>
-                        <span className="rounded bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold px-2 py-0.5">
+                        <span className="rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold px-2 py-0.5 border border-emerald-500/30">
                           {patient?.patient_code || authUser?.patient_code}
                         </span>
-                        <span className="rounded-full bg-emerald-500/10 text-emerald-700 text-[10px] font-semibold px-2 py-0.5 border border-emerald-300">
-                          🟢 Active 24h Session
+                        <span className="rounded-full bg-emerald-400 text-[#064e3b] text-[10px] font-extrabold px-2 py-0.5">
+                          🟢 24h Session
                         </span>
                       </div>
-                      <span className="text-[11px] text-slate-500 font-mono">
-                        ABHA Verified Account • Private Health Sandbox
+                      <span className="text-[11px] text-emerald-300/80 font-mono">
+                        ABHA ID Verified • Private Health Sandbox
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={handleLogout}
-                      className="rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 text-xs font-bold text-rose-700 transition cursor-pointer flex items-center gap-1.5"
+                      onClick={() => setShowSwitchModal(true)}
+                      className="rounded-xl border border-emerald-700 bg-emerald-900/70 hover:bg-emerald-800 px-3 py-1.5 text-xs font-semibold text-emerald-100 transition cursor-pointer"
                     >
-                      <span>🔒</span>
-                      <span>Lock Locker / Sign Out</span>
+                      Switch ID
                     </button>
                     <button
-                      onClick={() => setShowRegisterWizard(true)}
-                      className="rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white transition cursor-pointer shadow-xs"
+                      onClick={handleLogout}
+                      className="rounded-xl border border-rose-800/80 bg-rose-950/70 hover:bg-rose-900 px-3 py-1.5 text-xs font-bold text-rose-200 transition cursor-pointer"
                     >
-                      + Enroll New Patient
+                      🔒 Lock
                     </button>
                   </div>
-                </>
+                </div>
               ) : (
-                <>
-                  <div className="flex items-center gap-2.5">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500 text-white font-bold text-sm shadow-xs">
-                      🔒
-                    </span>
+                <div className="rounded-2xl bg-amber-950/60 border border-amber-800/60 p-3 flex flex-wrap items-center justify-between gap-3 text-xs text-amber-200">
+                  <div className="flex items-center gap-2 text-left">
+                    <span className="text-base">🔒</span>
                     <div>
-                      <div className="font-bold text-slate-900 flex items-center gap-2">
-                        <span>Locker Locked (HIPAA Protected)</span>
-                        <span className="rounded bg-amber-100 text-amber-800 text-[10px] font-mono font-bold px-2 py-0.5">
-                          AUTH REQUIRED
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-slate-500">
-                        Sign in below with your ABHA ID &amp; 4-digit PIN or mobile OTP
-                      </span>
+                      <span className="font-bold text-white">Locker Locked (HIPAA Protected)</span>
+                      <p className="text-[11px] text-amber-300">
+                        Sign in with registered PIN or mobile OTP to unlock private records.
+                      </p>
                     </div>
                   </div>
-
                   <button
-                    onClick={() => setShowRegisterWizard(true)}
-                    className="rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white transition cursor-pointer shadow-xs"
+                    onClick={() => {
+                      const el = document.getElementById('patient-auth-section')
+                      if (el) el.scrollIntoView({ behavior: 'smooth' })
+                    }}
+                    className="rounded-xl bg-amber-500 hover:bg-amber-600 px-3.5 py-1.5 text-xs font-bold text-slate-950 transition cursor-pointer shadow-xs"
                   >
-                    + Enroll New Patient
+                    Unlock Locker
                   </button>
-                </>
+                </div>
               )}
             </div>
           </div>
+
+          {/* Right Column: Flat Vector Doctor Right Illustration */}
+          <div className="hidden lg:flex lg:col-span-3 justify-center items-center">
+            <DoctorTeamRightIllustration className="w-full max-h-56 object-contain drop-shadow-md" />
+          </div>
         </div>
       </section>
+
+      {/* 4. Four Quick Action Cards matching Apollo Pharmacy Screenshot */}
+      <section className="max-w-7xl mx-auto w-full px-6 -mt-5 relative z-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Card 1: Prescription Ingestion (Mint Tint) */}
+          <div
+            onClick={() => heroFileInputRef.current?.click()}
+            className="rounded-2xl border border-emerald-200 bg-[#ECFDF5] p-4 shadow-sm hover:shadow-md transition cursor-pointer flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white border border-emerald-200 text-xl shadow-2xs">
+                📄
+              </div>
+              <div>
+                <div className="text-xs font-black text-slate-900 group-hover:text-emerald-800">
+                  Upload Prescriptions
+                </div>
+                <div className="text-[10px] text-emerald-700 font-bold tracking-wider mt-0.5">
+                  OCR &amp; INGEST NOW →
+                </div>
+              </div>
+            </div>
+            <span className="text-slate-400 group-hover:text-emerald-700 font-bold">›</span>
+          </div>
+
+          {/* Card 2: Doctor Appointment (Lavender Tint) */}
+          <div
+            onClick={() => {
+              if (onBookAppointmentRedirect) {
+                onBookAppointmentRedirect()
+              } else if (onSwitchPersona) {
+                onSwitchPersona('doctor')
+              }
+            }}
+            className="rounded-2xl border border-indigo-200 bg-[#EEF2FF] p-4 shadow-sm hover:shadow-md transition cursor-pointer flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white border border-indigo-200 text-xl shadow-2xs">
+                🩺
+              </div>
+              <div>
+                <div className="text-xs font-black text-slate-900 group-hover:text-indigo-800">
+                  Doctor Appointment
+                </div>
+                <div className="text-[10px] text-indigo-700 font-bold tracking-wider mt-0.5">
+                  BOOK NOW →
+                </div>
+              </div>
+            </div>
+            <span className="text-slate-400 group-hover:text-indigo-700 font-bold">›</span>
+          </div>
+
+          {/* Card 3: Family Health & QR Pass (Warm Peach Tint) */}
+          <div
+            onClick={() => setActiveTab('family')}
+            className="rounded-2xl border border-amber-200 bg-[#FEF3C7] p-4 shadow-sm hover:shadow-md transition cursor-pointer flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white border border-amber-200 text-xl shadow-2xs">
+                👨‍👩‍👧‍👦
+              </div>
+              <div>
+                <div className="text-xs font-black text-slate-900 group-hover:text-amber-800">
+                  Family Health Locker
+                </div>
+                <div className="text-[10px] text-amber-700 font-bold tracking-wider mt-0.5">
+                  EXPLORE PROFILES →
+                </div>
+              </div>
+            </div>
+            <span className="text-slate-400 group-hover:text-amber-700 font-bold">›</span>
+          </div>
+
+          {/* Card 4: Lab Diagnostics & Safety (Rose Tint) */}
+          <div
+            onClick={() => setActiveTab('locker')}
+            className="rounded-2xl border border-rose-200 bg-[#FFE4E6] p-4 shadow-sm hover:shadow-md transition cursor-pointer flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white border border-rose-200 text-xl shadow-2xs">
+                🔬
+              </div>
+              <div>
+                <div className="text-xs font-black text-slate-900 group-hover:text-rose-800">
+                  Lab Tests &amp; Safety
+                </div>
+                <div className="text-[10px] text-rose-700 font-bold tracking-wider mt-0.5">
+                  AT HOME &amp; VERIFIED →
+                </div>
+              </div>
+            </div>
+            <span className="text-slate-400 group-hover:text-rose-700 font-bold">›</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Browse by Health Conditions Section (Custom Flat Vector Icons) */}
+      <section className="max-w-7xl mx-auto w-full px-6 pt-10 pb-4">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-black text-slate-900 tracking-tight">
+              Browse by Health Conditions &amp; Clinical Care
+            </h2>
+            <p className="text-xs text-slate-500 font-medium">
+              Explore specialized disease protocols, active prescriptions, and drug-drug safety engines.
+            </p>
+          </div>
+          <button
+            onClick={() => setActiveTab('triage')}
+            className="text-xs font-bold text-[#064e3b] hover:underline cursor-pointer"
+          >
+            View All Specialties →
+          </button>
+        </div>
+
+        {/* 8 Condition Cards Grid with Custom Flat Vector SVGs */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          {/* 1. Diabetes Care */}
+          <div
+            onClick={() => {
+              setHeroSearchQuery('Metformin')
+              handleUserQuery('Metformin')
+              setActiveTab('voice')
+            }}
+            className="rounded-2xl border border-slate-200/90 bg-white p-3 text-center shadow-2xs hover:shadow-md hover:border-sky-300 transition cursor-pointer group"
+          >
+            <div className="mx-auto mb-2 flex justify-center">
+              <DiabetesVectorIcon className="w-11 h-11 group-hover:scale-105 transition-transform" />
+            </div>
+            <div className="text-xs font-bold text-slate-800 group-hover:text-sky-700">Diabetes Care</div>
+            <div className="text-[10px] text-slate-400 font-mono mt-0.5">HbA1c &amp; Insulin</div>
+          </div>
+
+          {/* 2. Cardiac Care */}
+          <div
+            onClick={() => {
+              setHeroSearchQuery('Warfarin')
+              handleUserQuery('Warfarin')
+              setActiveTab('voice')
+            }}
+            className="rounded-2xl border border-slate-200/90 bg-white p-3 text-center shadow-2xs hover:shadow-md hover:border-rose-300 transition cursor-pointer group"
+          >
+            <div className="mx-auto mb-2 flex justify-center">
+              <CardiacVectorIcon className="w-11 h-11 group-hover:scale-105 transition-transform" />
+            </div>
+            <div className="text-xs font-bold text-slate-800 group-hover:text-rose-700">Cardiac Care</div>
+            <div className="text-[10px] text-slate-400 font-mono mt-0.5">Warfarin Safety</div>
+          </div>
+
+          {/* 3. Stomach & GI */}
+          <div
+            onClick={() => {
+              setSymptomInput('Stomach acid and nausea')
+              runSymptomTriage('Stomach acid and nausea')
+              setActiveTab('triage')
+            }}
+            className="rounded-2xl border border-slate-200/90 bg-white p-3 text-center shadow-2xs hover:shadow-md hover:border-amber-300 transition cursor-pointer group"
+          >
+            <div className="mx-auto mb-2 flex justify-center">
+              <StomachVectorIcon className="w-11 h-11 group-hover:scale-105 transition-transform" />
+            </div>
+            <div className="text-xs font-bold text-slate-800 group-hover:text-amber-700">Stomach Care</div>
+            <div className="text-[10px] text-slate-400 font-mono mt-0.5">GI &amp; Antacids</div>
+          </div>
+
+          {/* 4. Pain Relief */}
+          <div
+            onClick={() => {
+              setHeroSearchQuery('Aspirin')
+              handleUserQuery('Aspirin')
+              setActiveTab('voice')
+            }}
+            className="rounded-2xl border border-slate-200/90 bg-white p-3 text-center shadow-2xs hover:shadow-md hover:border-purple-300 transition cursor-pointer group"
+          >
+            <div className="mx-auto mb-2 flex justify-center">
+              <PainReliefVectorIcon className="w-11 h-11 group-hover:scale-105 transition-transform" />
+            </div>
+            <div className="text-xs font-bold text-slate-800 group-hover:text-purple-700">Pain Relief</div>
+            <div className="text-[10px] text-slate-400 font-mono mt-0.5">Joints &amp; NSAIDs</div>
+          </div>
+
+          {/* 5. Respiratory */}
+          <div
+            onClick={() => {
+              setHeroSearchQuery('Albuterol')
+              handleUserQuery('Albuterol')
+              setActiveTab('voice')
+            }}
+            className="rounded-2xl border border-slate-200/90 bg-white p-3 text-center shadow-2xs hover:shadow-md hover:border-cyan-300 transition cursor-pointer group"
+          >
+            <div className="mx-auto mb-2 flex justify-center">
+              <RespiratoryVectorIcon className="w-11 h-11 group-hover:scale-105 transition-transform" />
+            </div>
+            <div className="text-xs font-bold text-slate-800 group-hover:text-cyan-700">Respiratory</div>
+            <div className="text-[10px] text-slate-400 font-mono mt-0.5">Asthma Inhaler</div>
+          </div>
+
+          {/* 6. Neurology */}
+          <div
+            onClick={() => {
+              setSymptomInput('Headache and dizziness')
+              runSymptomTriage('Headache and dizziness')
+              setActiveTab('triage')
+            }}
+            className="rounded-2xl border border-slate-200/90 bg-white p-3 text-center shadow-2xs hover:shadow-md hover:border-pink-300 transition cursor-pointer group"
+          >
+            <div className="mx-auto mb-2 flex justify-center">
+              <NeurologyVectorIcon className="w-11 h-11 group-hover:scale-105 transition-transform" />
+            </div>
+            <div className="text-xs font-bold text-slate-800 group-hover:text-pink-700">Neurology</div>
+            <div className="text-[10px] text-slate-400 font-mono mt-0.5">Brain &amp; Nerves</div>
+          </div>
+
+          {/* 7. Elderly Care */}
+          <div
+            onClick={() => setActiveTab('family')}
+            className="rounded-2xl border border-slate-200/90 bg-white p-3 text-center shadow-2xs hover:shadow-md hover:border-emerald-300 transition cursor-pointer group"
+          >
+            <div className="mx-auto mb-2 flex justify-center">
+              <ElderlyCareVectorIcon className="w-11 h-11 group-hover:scale-105 transition-transform" />
+            </div>
+            <div className="text-xs font-bold text-slate-800 group-hover:text-emerald-700">Elderly Care</div>
+            <div className="text-[10px] text-slate-400 font-mono mt-0.5">Family Senior</div>
+          </div>
+
+          {/* 8. Cold & Immunity */}
+          <div
+            onClick={() => {
+              setSymptomInput('Fever and dry cough')
+              runSymptomTriage('Fever and dry cough')
+              setActiveTab('triage')
+            }}
+            className="rounded-2xl border border-slate-200/90 bg-white p-3 text-center shadow-2xs hover:shadow-md hover:border-emerald-300 transition cursor-pointer group"
+          >
+            <div className="mx-auto mb-2 flex justify-center">
+              <ColdImmunityVectorIcon className="w-11 h-11 group-hover:scale-105 transition-transform" />
+            </div>
+            <div className="text-xs font-bold text-slate-800 group-hover:text-emerald-700">Cold &amp; Immunity</div>
+            <div className="text-[10px] text-slate-400 font-mono mt-0.5">Immune Shield</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Floating Medical AI Companion Button (Apollo WhatsApp Style) */}
+      <button
+        type="button"
+        onClick={() => setActiveTab('voice')}
+        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-[#064e3b] text-white px-4 py-3 shadow-2xl hover:bg-[#053b2e] hover:scale-105 transition-all cursor-pointer border-2 border-emerald-400/40"
+        aria-label="Ask PulseVault AI Medical Companion"
+      >
+        <span className="relative flex h-3 w-3">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400" />
+        </span>
+        <span className="text-sm">🎙️</span>
+        <span className="text-xs font-black tracking-tight hidden sm:inline">AI Medical Companion</span>
+      </button>
 
       {/* 3. Patient Workspace Navigation Bar / Security Header */}
       {isAuthenticated ? (
@@ -757,7 +1169,7 @@ export function PatientLandingView({
       {/* 4. Active Tab Content Container */}
       <main className="p-7 max-w-7xl w-full mx-auto flex-1 space-y-6">
         {!isAuthenticated ? (
-          <div className="max-w-xl mx-auto py-8">
+          <div id="patient-auth-section" className="max-w-xl mx-auto py-8">
             <div className="rounded-3xl border border-slate-200/80 bg-white p-8 shadow-xl space-y-6">
               <div className="text-center space-y-2">
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white text-2xl shadow-md shadow-emerald-500/20">

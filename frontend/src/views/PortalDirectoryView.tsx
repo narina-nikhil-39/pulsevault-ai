@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { fetchDoctors, type DoctorItem } from '../api'
 import { PatientRegisterWizard } from '../components/PatientRegisterWizard'
+import {
+  DoctorTeamLeftIllustration,
+  DoctorTeamRightIllustration,
+} from '../components/FlatVectorHealthcareIllustrations'
 
 interface PortalDirectoryViewProps {
   onNavigate: (route: 'reception' | 'doctor' | 'patient', patientCode?: string) => void
@@ -21,11 +25,11 @@ export function PortalDirectoryView({ onNavigate }: PortalDirectoryViewProps) {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
       {/* Top Banner / System Navigation */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200/80 px-8 py-4">
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200/90 px-8 py-3.5">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#064e3b] text-white shadow-md shadow-emerald-950/20">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -36,19 +40,19 @@ export function PortalDirectoryView({ onNavigate }: PortalDirectoryViewProps) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xl font-black text-slate-900 tracking-tight">SynapseHealth</span>
-                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600 border border-blue-200">
-                  PulseVault AI v2.4
+                <span className="text-xl font-black text-[#064e3b] tracking-tight">SynapseHealth</span>
+                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-[#064e3b] border border-emerald-200">
+                  PulseVault AI Enterprise
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-medium">Enterprise Multimodal Clinical Intelligence Platform</p>
+              <p className="text-xs text-slate-400 font-medium">Decoupled Tri-Party Clinical Operating Platform</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowRegisterModal(true)}
-              className="rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/20 hover:bg-blue-700 transition flex items-center gap-2"
+              className="rounded-xl bg-[#064e3b] hover:bg-[#053b2e] px-4 py-2.5 text-xs font-bold text-white shadow-sm shadow-emerald-950/20 transition flex items-center gap-2 cursor-pointer"
             >
               <span>+</span>
               <span>New Patient Intake</span>
@@ -59,40 +63,52 @@ export function PortalDirectoryView({ onNavigate }: PortalDirectoryViewProps) {
 
       {/* Main Container */}
       <main className="max-w-7xl w-full mx-auto px-8 py-8 flex-1 space-y-10">
-        {/* Hero Section */}
-        <div className="rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-8 sm:p-10 text-white shadow-xl relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-blue-300 backdrop-blur">
-              <span>⚡</span>
-              <span>Autonomous Clinical Graph &amp; Patient Safety Protocol</span>
+        {/* Hero Section with Custom Flat Vector Doctor Illustrations (Dark Green & White) */}
+        <div className="rounded-3xl bg-gradient-to-r from-[#06382f] via-[#09483c] to-[#06382f] p-8 sm:p-10 text-white shadow-xl relative overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+            {/* Left Vector Doctor Illustration */}
+            <div className="hidden lg:flex lg:col-span-3 justify-center items-center">
+              <DoctorTeamLeftIllustration className="w-full max-h-52 object-contain drop-shadow" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
-              Hospital Operating System &amp; Decoupled Portal Gateway
-            </h1>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Seamlessly unify fragmented records, detect lethal drug-drug interactions with deterministic safety interlocks,
-              and empower frontline clinicians with real-time vector RAG and dual-authorized break-glass emergency overrides.
-            </p>
 
-            {/* Health Indicators */}
-            <div className="pt-2 flex flex-wrap gap-2.5 text-[11px] font-semibold text-slate-300">
-              <span className="rounded-lg bg-white/5 border border-white/10 px-2.5 py-1 flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                PostgreSQL Cloud DB: Active
-              </span>
-              <span className="rounded-lg bg-white/5 border border-white/10 px-2.5 py-1 flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-blue-400" />
-                Neo4j Graph: Synchronized
-              </span>
-              <span className="rounded-lg bg-white/5 border border-white/10 px-2.5 py-1 flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-purple-400" />
-                Qdrant Vector Store: Armed
-              </span>
-              <span className="rounded-lg bg-white/5 border border-white/10 px-2.5 py-1 flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-amber-400" />
-                Break-Glass Protocol: Dual-Key Verified
-              </span>
+            {/* Center Content */}
+            <div className="lg:col-span-6 space-y-4 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-950/70 border border-emerald-700/60 px-3 py-1 text-xs font-semibold text-emerald-200">
+                <span>⚡</span>
+                <span>Autonomous Clinical Graph &amp; Patient Safety Protocol</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight text-white">
+                Hospital Operating System &amp; Decoupled Portals
+              </h1>
+              <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed font-medium">
+                Seamlessly unify fragmented records, detect lethal drug-drug interactions with deterministic safety interlocks,
+                and empower frontline clinicians with real-time vector RAG and dual-authorized break-glass emergency overrides.
+              </p>
+
+              {/* Health Indicators */}
+              <div className="pt-2 flex flex-wrap gap-2 text-[11px] font-semibold text-emerald-100">
+                <span className="rounded-lg bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  PostgreSQL Cloud DB: Active
+                </span>
+                <span className="rounded-lg bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-cyan-400" />
+                  Neo4j Graph: Synchronized
+                </span>
+                <span className="rounded-lg bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-purple-400" />
+                  Qdrant Vector Store: Armed
+                </span>
+                <span className="rounded-lg bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-amber-400" />
+                  Break-Glass: Dual-Key Verified
+                </span>
+              </div>
+            </div>
+
+            {/* Right Vector Doctor Illustration */}
+            <div className="hidden lg:flex lg:col-span-3 justify-center items-center">
+              <DoctorTeamRightIllustration className="w-full max-h-52 object-contain drop-shadow" />
             </div>
           </div>
         </div>
