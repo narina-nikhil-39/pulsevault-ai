@@ -73,6 +73,8 @@ from app.schemas import (
     RagChunkOut,
     RagQueryRequest,
     RagQueryResponse,
+    SafetySimulateRequest,
+    SafetySimulateResponse,
     UploadResponse,
 )
 from src.agents.flashcard_agent import FlashcardAgent
@@ -857,6 +859,111 @@ def query_patient_rag(
         ],
         backend=rag_service.backend,
     )
+
+
+@app.get("/api/documents/{document_id}/pages/{page_num}/render")
+def render_document_page(
+    document_id: int,
+    page_num: int = 1,
+    db: Session = Depends(get_db),
+) -> Response:
+    """Render a physical PDF page as a high-fidelity PNG image for spatial grounding."""
+    document = db.get(SourceDocument, document_id)
+    if not document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document #{document_id} not found.",
+        )
+
+    upload_dir = get_upload_dir()
+    file_bytes: Optional[bytes] = None
+
+    matches = list(upload_dir.glob(f"{document_id}_*"))
+    if matches and matches[0].exists():
+        try:
+            file_bytes = matches[0].read_bytes()
+        except Exception:
+            pass
+
+    if not file_bytes:
+        # Fallback 1x1 transparent PNG if file not on disk
+        return Response(
+            content=b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\rIDATx\x9cc`\x00\x00\x00\x02\x00\x01H\xaf\xa4q\x00\x00\x00\x00IEND\xaeB`\x82",
+            media_type="image/png",
+            headers={"Cache-Control": "public, max-age=60"},
+        )
+
+    mime = (document.mime_type or "").lower()
+    if any(ext in mime for ext in ("png", "jpeg", "jpg", "webp", "tiff")):
+        return Response(
+            content=file_bytes,
+            media_type=document.mime_type or "image/png",
+            headers={"Cache-Control": "public, max-age=3600"},
+        )
+
+    try:
+        import fitz
+
+        pdf_doc = fitz.open(stream=file_bytes, filetype="pdf")
+        if len(pdf_doc) == 0:
+            raise ValueError("PDF contains 0 pages")
+        target_page_idx = max(0, min(len(pdf_doc) - 1, page_num - 1))
+        page = pdf_doc[target_page_idx]
+        pix = page.get_pixmap(dpi=150)
+        png_bytes = pix.tobytes("png")
+        return Response(
+            content=png_bytes,
+            media_type="image/png",
+            headers={"Cache-Control": "public, max-age=3600"},
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to render document page: {exc}",
+        )
+
+
+@app.post(
+    "/api/patients/{patient_code}/safety/simulate",
+    response_model=SafetySimulateResponse,
+)
+def simulate_prospective_prescription(
+    patient_code: str,
+    payload: SafetySimulateRequest,
+    db: Session = Depends(get_db),
+    doctor: AuthenticatedDoctor = Depends(require_standard_clinician),
+) -> SafetySimulateResponse:
+    """Evaluate deterministic safety interlocks for a candidate prospective prescription."""
+    patient = db.scalar(select(Patient).where(Patient.patient_code == patient_code))
+    if patient is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Patient '{patient_code}' not found.",
+        )
+
+    result = pipeline.safety_agent.simulate(
+        db=db,
+        patient=patient,
+        candidate_drug=payload.candidate_drug,
+        dose=payload.dose,
+    )
+
+    audit_logger.record(
+        db,
+        actor=doctor.doctor_id,
+        action="prescription.simulated",
+        resource_type="patient",
+        resource_id=patient.patient_code,
+        detail={
+            "candidate_drug": payload.candidate_drug,
+            "dose": payload.dose,
+            "is_safe": result["is_safe"],
+            "findings_count": result["total_findings"],
+        },
+    )
+    db.commit()
+
+    return SafetySimulateResponse(**result)
 
 
 

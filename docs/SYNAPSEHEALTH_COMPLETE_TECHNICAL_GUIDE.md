@@ -170,13 +170,13 @@ Co-signing Nurse Credentials ──┘
 
 ---
 
-## 4. Grounded RAG with 2D Spatial Bounding-Box Overlay
+## 4. Grounded RAG with 2D Spatial Bounding-Box Overlay & Pixel Streaming
 
-* **Implementation**: [src/services/rag_service.py](src/services/rag_service.py), [frontend/src/components/RagAssistantView.tsx](frontend/src/components/RagAssistantView.tsx)
+* **Implementation**: [src/services/rag_service.py](src/services/rag_service.py), [frontend/src/components/RagAssistantView.tsx](frontend/src/components/RagAssistantView.tsx), [app/main.py](app/main.py)
 
 1. **Patient-Scoped Retrieval**: Queries in the Doctor Console execute semantic search over Qdrant chunks filtered strictly by `patient_code`.
 2. **Spatial Grounding**: Every retrieved chunk contains the physical coordinates $[x_0, y_0, x_1, y_1]$ and page index from the original document.
-3. **Interactive Document Canvas**: Clinicians click on any citation badge to view an interactive simulated $8.5'' \times 11''$ document sheet with an **animated glowing bounding box** over the exact physical coordinates where the text was extracted, eliminating generative hallucinations.
+3. **Interactive Document Canvas with Real Pixel Streaming**: Clinicians click on any citation badge to view the actual rendered document page pixels (`GET /api/documents/{id}/pages/{page}/render` via PyMuPDF `page.get_pixmap()`) overlaid with an **animated glowing amber bounding box** directly over the exact scanned handwriting or lab row, eliminating generative hallucinations.
 
 ---
 
@@ -194,14 +194,15 @@ SynapseHealth employs a polyglot persistence architecture optimized for relation
 
 ## 6. The Tri-Party Frontend Ecosystem (React 19 + Vite)
 
-Unified by the **Universal App Header** ([frontend/src/components/UniversalAppHeader.tsx](frontend/src/components/UniversalAppHeader.tsx)), the frontend provides three role-based portals and an analytics dashboard:
+Unified by the **Universal App Header** ([frontend/src/components/UniversalAppHeader.tsx](frontend/src/components/UniversalAppHeader.tsx)) and global **`Ctrl+K` / `Cmd+K` Clinical Command Palette** ([frontend/src/components/CommandPaletteModal.tsx](frontend/src/components/CommandPaletteModal.tsx)), the frontend provides three role-based portals and an analytics dashboard:
 
 1. **Doctor Console (`/doctor`)** ([frontend/src/views/DoctorConsoleView.tsx](frontend/src/views/DoctorConsoleView.tsx)):
    * Longitudinal chronological timeline.
    * Interactive SVG clinical knowledge graph.
-   * Grounded Qdrant RAG Assistant with 2D spatial bounding-box overlay.
+   * Grounded Qdrant RAG Assistant with 2D spatial bounding-box overlay and live raster page pixel streaming.
+   * **Live "What-If" Prescription Simulator** ([frontend/src/components/SafetyView.tsx](frontend/src/components/SafetyView.tsx)): Instant contraindication & allergy sandbox before prescribing.
    * Deterministic safety alert auditor.
-   * Dual-signature Break-Glass emergency modal.
+   * Dual-signature Break-Glass emergency modal with **Source Provenance Split Drawer** ([frontend/src/components/EmergencyFlashcard.tsx](frontend/src/components/EmergencyFlashcard.tsx)).
 2. **Reception & Triage Desk (`/reception`)** ([frontend/src/views/ReceptionDeskView.tsx](frontend/src/views/ReceptionDeskView.tsx)):
    * Native WebRTC hardware camera QR/barcode scanner ([frontend/src/components/QRCameraScanner.tsx](frontend/src/components/QRCameraScanner.tsx)).
    * Real-time outpatient queue management and doctor check-in.
@@ -209,7 +210,7 @@ Unified by the **Universal App Header** ([frontend/src/components/UniversalAppHe
 3. **Patient Health Locker (`/patient`)** ([frontend/src/views/PatientLandingView.tsx](frontend/src/views/PatientLandingView.tsx)):
    * 4-step self-service onboarding wizard ([frontend/src/components/PatientRegisterWizard.tsx](frontend/src/components/PatientRegisterWizard.tsx)).
    * Personal medical record locker.
-   * Digital Emergency QR Pass.
+   * **Downloadable Emergency QR Wallet Card** ([frontend/src/components/WalletQrCard.tsx](frontend/src/components/WalletQrCard.tsx)): High-contrast PNG smart card generation for phone-to-camera scanning.
 4. **Live Benchmark & Metrics Dashboard (`/benchmarks`)** ([frontend/src/views/BenchmarkDashboardView.tsx](frontend/src/views/BenchmarkDashboardView.tsx)):
    * Visual comparison charts (Deterministic 100% vs Baseline LLM 78.4%).
    * Logarithmic latency distribution gauges.

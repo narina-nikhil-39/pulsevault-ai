@@ -122,6 +122,80 @@ class SafetyAgent:
 
         return report
 
+    def simulate(
+        self,
+        db: Session,
+        patient: Patient,
+        candidate_drug: str,
+        dose: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Simulate adding a candidate prescription against the patient's active records without committing."""
+        candidate_name = candidate_drug.strip()
+        if not candidate_name:
+            return {"is_safe": True, "candidate_drug": "", "findings": []}
+
+        lookup_result = self.terminology.lookup(candidate_name)
+        rxnorm_cui = lookup_result.rxcui if lookup_result else None
+
+        simulated_med = Medication(
+            patient_id=patient.id,
+            name=candidate_name,
+            dose=dose or "",
+            status="active",
+            rxnorm_code=rxnorm_cui,
+        )
+
+        existing_meds = list(
+            db.scalars(
+                select(Medication)
+                .where(Medication.patient_id == patient.id, Medication.status == "active")
+            ).all()
+        )
+        allergies = list(
+            db.scalars(select(Allergy).where(Allergy.patient_id == patient.id)).all()
+        )
+        conditions = list(
+            db.scalars(
+                select(Condition)
+                .where(Condition.patient_id == patient.id, Condition.status == "active")
+            ).all()
+        )
+
+        all_meds = existing_meds + [simulated_med]
+
+        raw_findings: List[SafetyFinding] = []
+        raw_findings.extend(self._allergy_findings(all_meds, allergies))
+        report_counter = SafetyReport()
+        raw_findings.extend(self._interaction_findings(all_meds, report_counter))
+        raw_findings.extend(self._contraindication_findings(all_meds, conditions))
+        raw_findings.extend(self._duplicate_findings(all_meds))
+
+        deduped = self._dedupe(raw_findings)
+        deduped.sort(key=_severity_rank)
+
+        cand_lower = candidate_name.lower()
+        relevant = [
+            f
+            for f in deduped
+            if any(cand_lower in item.lower() or item.lower() in cand_lower for item in f.involved)
+        ]
+
+        return {
+            "candidate_drug": candidate_name,
+            "dose": dose,
+            "rxnorm_cui": rxnorm_cui,
+            "is_safe": len(relevant) == 0,
+            "total_findings": len(relevant),
+            "critical_count": sum(1 for f in relevant if f.severity == rules.CRITICAL),
+            "high_count": sum(1 for f in relevant if f.severity == rules.HIGH),
+            "findings": [f.as_dict() for f in relevant],
+            "patient_context": {
+                "active_medications_count": len(existing_meds),
+                "allergies_count": len(allergies),
+                "conditions_count": len(conditions),
+            },
+        }
+
     def _allergy_findings(
         self, medications: List[Medication], allergies: List[Allergy]
     ) -> List[SafetyFinding]:

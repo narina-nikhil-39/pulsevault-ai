@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import {
+  getDocumentPageImageUrl,
   queryPatientRag,
   type RagChunk,
   type RagQueryResponse,
@@ -23,6 +24,7 @@ export function RagAssistantView({ patientCode }: RagAssistantViewProps) {
   const [response, setResponse] = useState<RagQueryResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [selectedChunk, setSelectedChunk] = useState<RagChunk | null>(null)
+  const [imageError, setImageError] = useState(false)
 
   async function handleSearch(searchQuery: string) {
     const trimmed = searchQuery.trim()
@@ -361,37 +363,47 @@ export function RagAssistantView({ patientCode }: RagAssistantViewProps) {
                   </span>
                 </div>
 
-                {/* Simulated Document Sheet Canvas */}
-                <div className="relative w-full aspect-[1/1.3] bg-slate-50 rounded-2xl border-2 border-slate-200 p-4 shadow-md overflow-hidden flex flex-col justify-between">
-                  {/* Document Background Skeleton Lines */}
-                  <div className="space-y-2.5 opacity-35 select-none pointer-events-none">
-                    <div className="h-3 w-1/3 bg-slate-400 rounded-full mb-4" />
-                    <div className="h-2 w-full bg-slate-300 rounded-full" />
-                    <div className="h-2 w-5/6 bg-slate-300 rounded-full" />
-                    <div className="h-2 w-4/6 bg-slate-300 rounded-full" />
-                    <div className="h-2 w-full bg-slate-300 rounded-full" />
-                    <div className="h-2 w-3/4 bg-slate-300 rounded-full" />
-                    <div className="h-2 w-full bg-slate-300 rounded-full" />
-                    <div className="h-2 w-5/6 bg-slate-300 rounded-full" />
-                    <div className="h-2 w-2/3 bg-slate-300 rounded-full" />
-                    <div className="h-2 w-full bg-slate-300 rounded-full" />
-                    <div className="h-2 w-4/5 bg-slate-300 rounded-full" />
-                    <div className="h-2 w-3/4 bg-slate-300 rounded-full" />
-                  </div>
+                {/* Document Sheet Canvas with Real Image Rendering & Bounding-Box Overlay */}
+                <div className="relative w-full aspect-[1/1.3] bg-white rounded-2xl border-2 border-slate-200 p-2 shadow-md overflow-hidden flex flex-col justify-between">
+                  {/* Real Document Page Pixel Stream */}
+                  {selectedChunk.document_id && !imageError ? (
+                    <img
+                      src={getDocumentPageImageUrl(selectedChunk.document_id, selectedChunk.page)}
+                      alt={`Document ${selectedChunk.document_title || ''} Page ${selectedChunk.page}`}
+                      className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none z-0 bg-white"
+                      onError={() => setImageError(true)}
+                    />
+                  ) : (
+                    /* Fallback Document Background Skeleton Lines */
+                    <div className="space-y-2.5 opacity-35 select-none pointer-events-none p-3">
+                      <div className="h-3 w-1/3 bg-slate-400 rounded-full mb-4" />
+                      <div className="h-2 w-full bg-slate-300 rounded-full" />
+                      <div className="h-2 w-5/6 bg-slate-300 rounded-full" />
+                      <div className="h-2 w-4/6 bg-slate-300 rounded-full" />
+                      <div className="h-2 w-full bg-slate-300 rounded-full" />
+                      <div className="h-2 w-3/4 bg-slate-300 rounded-full" />
+                      <div className="h-2 w-full bg-slate-300 rounded-full" />
+                      <div className="h-2 w-5/6 bg-slate-300 rounded-full" />
+                      <div className="h-2 w-2/3 bg-slate-300 rounded-full" />
+                      <div className="h-2 w-full bg-slate-300 rounded-full" />
+                      <div className="h-2 w-4/5 bg-slate-300 rounded-full" />
+                      <div className="h-2 w-3/4 bg-slate-300 rounded-full" />
+                    </div>
+                  )}
 
                   {/* Dynamic Glowing Bounding-Box Target Rectangle */}
                   {(() => {
                     const pw = 612
                     const ph = 792
                     const b = selectedChunk.bbox
-                    const leftPct = Math.max(5, Math.min(85, (b[0] / pw) * 100))
-                    const topPct = Math.max(8, Math.min(85, (b[1] / ph) * 100))
-                    const widthPct = Math.max(15, Math.min(90 - leftPct, ((b[2] - b[0]) / pw) * 100))
-                    const heightPct = Math.max(6, Math.min(90 - topPct, ((b[3] - b[1]) / ph) * 100))
+                    const leftPct = Math.max(3, Math.min(85, (b[0] / pw) * 100))
+                    const topPct = Math.max(5, Math.min(85, (b[1] / ph) * 100))
+                    const widthPct = Math.max(12, Math.min(94 - leftPct, ((b[2] - b[0]) / pw) * 100))
+                    const heightPct = Math.max(5, Math.min(94 - topPct, ((b[3] - b[1]) / ph) * 100))
 
                     return (
                       <div
-                        className="absolute rounded-lg border-2 border-amber-500 bg-amber-400/25 shadow-lg shadow-amber-500/30 transition-all duration-500 flex items-start justify-between p-1 text-[9px] font-mono font-black text-amber-950 backdrop-blur-[1px] animate-pulse"
+                        className="absolute rounded-lg border-2 border-amber-500 bg-amber-400/35 shadow-lg shadow-amber-500/40 transition-all duration-500 flex items-start justify-between p-1 text-[9px] font-mono font-black text-amber-950 backdrop-blur-[1px] animate-pulse z-10"
                         style={{
                           left: `${leftPct}%`,
                           top: `${topPct}%`,
@@ -399,18 +411,18 @@ export function RagAssistantView({ patientCode }: RagAssistantViewProps) {
                           height: `${heightPct}%`,
                         }}
                       >
-                        <span className="bg-amber-500 text-white px-1 rounded text-[8px] leading-tight">
-                          MATCH
+                        <span className="bg-amber-500 text-white px-1 rounded text-[8px] leading-tight shadow-2xs">
+                          GROUNDED
                         </span>
-                        <span className="bg-white/80 px-1 rounded text-[8px] leading-tight">
+                        <span className="bg-white/90 px-1 rounded text-[8px] leading-tight shadow-2xs">
                           p.{selectedChunk.page}
                         </span>
                       </div>
                     )
                   })()}
 
-                  <div className="text-[10px] text-slate-400 text-center border-t border-slate-200/80 pt-1">
-                    Spatial coordinate validation verified with zero hallucination.
+                  <div className="text-[10px] text-slate-500 text-center border-t border-slate-200/80 pt-1 z-10 bg-white/80 backdrop-blur-xs rounded-b-xl">
+                    Physical coordinate grounding rendered directly over raw document pixels.
                   </div>
                 </div>
               </div>

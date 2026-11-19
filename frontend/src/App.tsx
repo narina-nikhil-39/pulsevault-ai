@@ -15,6 +15,7 @@ import { ReceptionDeskView } from './views/ReceptionDeskView'
 import { PortalDirectoryView } from './views/PortalDirectoryView'
 import { UniversalAppHeader } from './components/UniversalAppHeader'
 import { BenchmarkDashboardView } from './views/BenchmarkDashboardView'
+import { CommandPaletteModal } from './components/CommandPaletteModal'
 
 interface Doctor {
   doctor_id: string
@@ -46,6 +47,19 @@ function ClinicalWorkspace() {
   })
   const [profile, setProfile] = useState<PatientProfile | null>(null)
   const [loading, setLoading] = useState(false)
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
+
+  // Global Ctrl+K / Cmd+K listener
+  useEffect(() => {
+    function handleGlobalKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setCommandPaletteOpen((prev) => !prev)
+      }
+    }
+    window.addEventListener('keydown', handleGlobalKeyDown)
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown)
+  }, [])
 
   const loadProfile = useCallback(async (code: string) => {
     setLoading(true)
@@ -124,6 +138,16 @@ function ClinicalWorkspace() {
     }
   }, [doctor, patientCode, profile, loadProfile])
 
+  // Helper to render universal command palette modal
+  const renderCommandPalette = () => (
+    <CommandPaletteModal
+      isOpen={commandPaletteOpen}
+      onClose={() => setCommandPaletteOpen(false)}
+      onNavigate={navigate}
+      currentPatientCode={patientCode}
+    />
+  )
+
   // ROUTE 4: Live Benchmark & Metrics Dashboard (/benchmarks)
   if (route === 'benchmarks') {
     return (
@@ -132,10 +156,12 @@ function ClinicalWorkspace() {
           currentRoute={route}
           onNavigate={(dest, code) => navigate(dest, code)}
           currentPatientCode={patientCode}
+          onOpenCommandPalette={() => setCommandPaletteOpen(true)}
         />
         <main className="flex-1">
           <BenchmarkDashboardView />
         </main>
+        {renderCommandPalette()}
       </div>
     )
   }
@@ -148,10 +174,12 @@ function ClinicalWorkspace() {
           currentRoute={route}
           onNavigate={(dest, code) => navigate(dest, code)}
           currentPatientCode={patientCode}
+          onOpenCommandPalette={() => setCommandPaletteOpen(true)}
         />
         <PortalDirectoryView
           onNavigate={(dest, code) => navigate(dest, code)}
         />
+        {renderCommandPalette()}
       </div>
     )
   }
@@ -164,6 +192,7 @@ function ClinicalWorkspace() {
           currentRoute={route}
           onNavigate={(dest, code) => navigate(dest, code)}
           currentPatientCode={patientCode}
+          onOpenCommandPalette={() => setCommandPaletteOpen(true)}
         />
         <ReceptionDeskView
           persona="reception"
@@ -172,6 +201,7 @@ function ClinicalWorkspace() {
           onSelectPatientForDoctor={(code) => navigate('doctor', code)}
           onOpenPatientPortal={(code) => navigate('patient', code)}
         />
+        {renderCommandPalette()}
       </div>
     )
   }
@@ -184,6 +214,7 @@ function ClinicalWorkspace() {
           currentRoute={route}
           onNavigate={(dest, code) => navigate(dest, code)}
           currentPatientCode={patientCode}
+          onOpenCommandPalette={() => setCommandPaletteOpen(true)}
         />
         <PatientLandingView
           persona="patient"
@@ -191,6 +222,7 @@ function ClinicalWorkspace() {
           onNavigateHome={() => navigate('directory')}
           onBookAppointmentRedirect={() => navigate('reception')}
         />
+        {renderCommandPalette()}
       </div>
     )
   }
@@ -220,6 +252,7 @@ function ClinicalWorkspace() {
         <div className="flex-1 flex items-center justify-center p-6">
           <LoginView onSignedIn={handleSignIn} />
         </div>
+        {renderCommandPalette()}
       </div>
     )
   }
@@ -230,6 +263,7 @@ function ClinicalWorkspace() {
         currentRoute={route}
         onNavigate={(dest, code) => navigate(dest, code)}
         currentPatientCode={patientCode}
+        onOpenCommandPalette={() => setCommandPaletteOpen(true)}
       />
       <DoctorConsoleView
         doctor={doctor}
@@ -242,6 +276,7 @@ function ClinicalWorkspace() {
         onSwitchPersona={(p) => navigate(p)}
         onNavigateHome={() => navigate('directory')}
       />
+      {renderCommandPalette()}
     </div>
   )
 }

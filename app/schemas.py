@@ -330,3 +330,24 @@ class PatientRegistrationResponse(BaseModel):
     job_id: Optional[str] = None
     document_id: Optional[int] = None
     message: str
+
+
+class SafetySimulateRequest(BaseModel):
+    """Payload to simulate a prospective prescription against active patient records."""
+
+    candidate_drug: str
+    dose: Optional[str] = None
+
+
+class SafetySimulateResponse(BaseModel):
+    """Evaluation outcome of a prospective prescription simulation."""
+
+    candidate_drug: str
+    dose: Optional[str] = None
+    rxnorm_cui: Optional[str] = None
+    is_safe: bool
+    total_findings: int
+    critical_count: int
+    high_count: int
+    findings: List[Dict[str, Any]]
+    patient_context: Dict[str, Any]

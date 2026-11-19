@@ -814,3 +814,49 @@ export function registerPatient(payload: PatientRegistrationPayload): Promise<Pa
     auth: false,
   })
 }
+
+// =============================================================================
+// Live Document Page Render & Prescription Simulation
+// =============================================================================
+
+export function getDocumentPageImageUrl(documentId: number, pageNum = 1): string {
+  return `${BASE}/documents/${documentId}/pages/${pageNum}/render`
+}
+
+export interface SafetyFindingItem {
+  id: string
+  severity: string
+  category: string
+  title: string
+  detail: string
+  involved: string[]
+  recommendation: string
+  evidence: string
+}
+
+export interface SafetySimulateResult {
+  candidate_drug: string
+  dose: string | null
+  rxnorm_cui: string | null
+  is_safe: boolean
+  total_findings: number
+  critical_count: number
+  high_count: number
+  findings: SafetyFindingItem[]
+  patient_context: {
+    active_medications_count: number
+    allergies_count: number
+    conditions_count: number
+  }
+}
+
+export function simulatePrescription(
+  patientCode: string,
+  candidateDrug: string,
+  dose?: string,
+): Promise<SafetySimulateResult> {
+  return request<SafetySimulateResult>(`/patients/${encodeURIComponent(patientCode)}/safety/simulate`, {
+    method: 'POST',
+    json: { candidate_drug: candidateDrug, dose: dose || null },
+  })
+}

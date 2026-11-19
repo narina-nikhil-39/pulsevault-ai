@@ -4,6 +4,7 @@ interface UniversalAppHeaderProps {
   currentRoute: AppRoute
   onNavigate: (route: AppRoute, patientCode?: string) => void
   currentPatientCode?: string | null
+  onOpenCommandPalette?: () => void
 }
 
 const DEMO_PATIENTS = [
@@ -16,6 +17,7 @@ export function UniversalAppHeader({
   currentRoute,
   onNavigate,
   currentPatientCode,
+  onOpenCommandPalette,
 }: UniversalAppHeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-md px-4 py-2.5 shadow-2xs">
@@ -94,8 +96,22 @@ export function UniversalAppHeader({
           </button>
         </nav>
 
-        {/* Right Tools: Cohort Switcher & Architecture Modal Link */}
+        {/* Right Tools: Command Palette, Cohort Switcher & Architecture Modal Link */}
         <div className="flex items-center gap-2 text-xs">
+          {/* Global Command Palette Trigger */}
+          <button
+            type="button"
+            onClick={onOpenCommandPalette}
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 text-xs text-slate-700 transition shadow-2xs cursor-pointer"
+            title="Open Clinical Command Palette (Ctrl+K or Cmd+K)"
+          >
+            <span>⚡</span>
+            <span className="hidden xl:inline text-[11px] font-semibold text-slate-500">Command</span>
+            <kbd className="rounded bg-white px-1.5 py-0.2 text-[10px] font-mono font-bold text-slate-700 border border-slate-200 shadow-2xs">
+              ⌘K
+            </kbd>
+          </button>
+
           {/* Quick Demo Cohort Selector */}
           <div className="hidden lg:flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-xl text-[11px]">
             <span className="text-slate-400 font-semibold">Cohort:</span>

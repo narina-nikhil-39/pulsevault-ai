@@ -23,13 +23,17 @@
 1. **Hybrid Deterministic-Agentic Model:**
    - **Probabilistic AI Tier:** Multimodal document classification, Optical OCR density routing, and Clinical Named Entity Recognition (NER) via Google Gemini 1.5 Flash.
    - **Deterministic Safety Tier:** Hardcoded zero-hallucination Drug-Drug Interaction (DDI) rules, dose superseding, and cryptographic SHA-256 audit chaining.
-2. **Spatial Coordinate-Grounded RAG:**
-   - Vector indexing into Qdrant paired with exact PDF raster bounding boxes (`[x0, y0, x1, y1]`). Clinicians click on an extracted entity to instantly view the illuminated source citation on the original medical scan.
-3. **Continuous Flashcard Precomputation (Sub-3s SLA):**
-   - Continuously precomputes and caches versioned emergency packets whenever new records arrive. Achieves **1.18s retrieval** during trauma triage, bypassing slow (15–30s) runtime LLM generation.
-4. **Dual-Key "Break-Glass" Emergency Access:**
+2. **Spatial Coordinate-Grounded RAG & Real Pixel Streaming:**
+   - Vector indexing into Qdrant paired with exact PDF raster bounding boxes (`[x0, y0, x1, y1]`). Clinicians click on an extracted entity to instantly view the illuminated source citation over real rendered document page pixels (`GET /api/documents/{id}/pages/{page}/render` via PyMuPDF).
+3. **Live "What-If" Prescription Simulator:**
+   - In-memory clinical simulation sandbox (`POST /api/patients/{code}/safety/simulate`) testing candidate prescriptions against active medications, allergies, and renal biomarkers before issuing a prescription.
+4. **Continuous Flashcard Precomputation (Sub-3s SLA) & Source Provenance Drawer:**
+   - Continuously precomputes and caches versioned emergency packets whenever new records arrive. Achieves **1.18s retrieval** during trauma triage, with an interactive side-by-side drawer providing immediate click-to-source cryptographic verification.
+5. **Dual-Key "Break-Glass" Emergency Access:**
    - Attending Physician + Supervising Nurse dual-authorization generates ephemeral 60-minute JWT tokens for unconscious/trauma admissions, committing an immutable record to a cryptographic hash chain ($H_k = \text{SHA256}(H_{k-1} \parallel \dots)$).
-5. **Decoupled Multi-Portal Architecture:**
+6. **Global Command Palette (`Ctrl+K` / `Cmd+K`) & Downloadable Smart QR Wallet Pass:**
+   - Global keyboard modal for rapid patient lookup and emergency protocol execution; HTML5 canvas-rendered high-contrast emergency ID card export for phone-to-webcam triage check-in.
+7. **Decoupled Multi-Portal Architecture:**
    - **Hospital Directory (`/`):** Enterprise gateway with verified doctor catalog.
    - **Reception Desk (`/reception`):** Front-desk triage, QR camera scanning, dynamic doctor scheduling, and thermal queue token printing.
    - **Doctor Workstation (`/doctor`):** Interactive SVG clinical knowledge graph with pulsing red conflict arcs, grounded spatial RAG, and Break-Glass override modal.

@@ -10,6 +10,7 @@ import {
 } from '../api'
 import { AsyncProgressTracker } from '../components/AsyncProgressTracker'
 import { PatientRegisterWizard } from '../components/PatientRegisterWizard'
+import { WalletQrCard } from '../components/WalletQrCard'
 
 
 interface PatientLandingViewProps {
@@ -620,6 +621,9 @@ export function PatientLandingView({
                 </div>
               </div>
             </div>
+
+            {/* Emergency Smart Wallet Card with QR Download */}
+            {patient && <WalletQrCard patient={patient} />}
 
             {/* Active Prescriptions & Medications Card */}
             <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs space-y-4">
