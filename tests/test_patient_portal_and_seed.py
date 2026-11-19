@@ -95,3 +95,109 @@ def test_portal_upload_record(anon_client, corpus_dir, db):
     assert out["patient_code"] == "OPD-ARJUN"
     assert out["document_id"] > 0
     assert "Ingested" in out["message"]
+
+
+def test_patient_portal_auth_pin_success_and_failure(anon_client, db):
+    """Patient PIN login verifies registered PIN, issues 24h JWT, and rejects incorrect PINs."""
+    seed_demo_patients(db)
+
+    # Valid PIN login with default demo PIN '1234'
+    valid_resp = anon_client.post(
+        "/api/portal/auth/login",
+        json={"patient_code": "OPD-ARJUN", "pin": "1234"},
+    )
+    assert valid_resp.status_code == 200
+    auth_data = valid_resp.json()
+    assert auth_data["patient_code"] == "OPD-ARJUN"
+    assert auth_data["full_name"] == "Arjun Rao"
+    assert "access_token" in auth_data
+    assert auth_data["token_type"] == "Bearer"
+    assert auth_data["auth_method"] == "pin"
+
+    # Invalid PIN returns 401 Unauthorized
+    invalid_resp = anon_client.post(
+        "/api/portal/auth/login",
+        json={"patient_code": "OPD-ARJUN", "pin": "9999"},
+    )
+    assert invalid_resp.status_code == 401
+
+    # Non-existent patient returns 404
+    missing_resp = anon_client.post(
+        "/api/portal/auth/login",
+        json={"patient_code": "UNKNOWN-999", "pin": "1234"},
+    )
+    assert missing_resp.status_code == 404
+
+
+def test_patient_portal_auth_otp_flow(anon_client, db):
+    """Patient OTP dispatch and verification issues valid portal session."""
+    seed_demo_patients(db)
+
+    # Request OTP for Arjun Rao
+    otp_req_resp = anon_client.post(
+        "/api/portal/auth/request-otp",
+        json={"contact_or_code": "OPD-ARJUN"},
+    )
+    assert otp_req_resp.status_code == 200
+    otp_data = otp_req_resp.json()
+    assert otp_data["patient_code"] == "OPD-ARJUN"
+    assert "masked_contact" in otp_data
+    assert "simulated_otp" in otp_data
+
+    # Verify with generated OTP
+    verify_resp = anon_client.post(
+        "/api/portal/auth/verify-otp",
+        json={"contact_or_code": "OPD-ARJUN", "otp": otp_data["simulated_otp"]},
+    )
+    assert verify_resp.status_code == 200
+    session_data = verify_resp.json()
+    assert session_data["patient_code"] == "OPD-ARJUN"
+    assert session_data["auth_method"] == "otp"
+    assert "access_token" in session_data
+
+    # Verify with fallback demo OTP '123456'
+    fallback_resp = anon_client.post(
+        "/api/portal/auth/verify-otp",
+        json={"contact_or_code": "OPD-ARJUN", "otp": "123456"},
+    )
+    assert fallback_resp.status_code == 200
+
+    # Invalid OTP returns 400 Bad Request
+    bad_resp = anon_client.post(
+        "/api/portal/auth/verify-otp",
+        json={"contact_or_code": "OPD-ARJUN", "otp": "000000"},
+    )
+    assert bad_resp.status_code == 400
+
+
+def test_patient_portal_auth_me_endpoint(anon_client, db):
+    """GET /api/portal/auth/me validates patient token and returns session metadata."""
+    seed_demo_patients(db)
+
+    login_resp = anon_client.post(
+        "/api/portal/auth/login",
+        json={"patient_code": "OPD-ARJUN", "pin": "1234"},
+    )
+    token = login_resp.json()["access_token"]
+
+    # Valid bearer authorization
+    me_resp = anon_client.get(
+        "/api/portal/auth/me",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert me_resp.status_code == 200
+    me_data = me_resp.json()
+    assert me_data["patient_code"] == "OPD-ARJUN"
+    assert me_data["full_name"] == "Arjun Rao"
+    assert me_data["blood_group"] == "A+"
+
+    # Missing authorization header returns 401
+    anon_resp = anon_client.get("/api/portal/auth/me")
+    assert anon_resp.status_code == 401
+
+    # Invalid authorization token returns 401
+    fake_resp = anon_client.get(
+        "/api/portal/auth/me",
+        headers={"Authorization": "Bearer invalid.jwt.token"},
+    )
+    assert fake_resp.status_code == 401

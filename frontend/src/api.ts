@@ -44,6 +44,7 @@ interface RequestOptions {
   body?: BodyInit
   json?: unknown
   auth?: boolean
+  headers?: Record<string, string>
 }
 
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
@@ -60,7 +61,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     throw new ApiError(0, 'Terminal is currently offline.')
   }
 
-  const headers: Record<string, string> = {}
+  const headers: Record<string, string> = { ...options.headers }
   if (auth) {
     const token = localStorage.getItem(TOKEN_KEY)
     if (token) {
@@ -535,6 +536,111 @@ export function uploadPortalRecord(file: File, patientCode: string): Promise<Upl
     method: 'POST',
     body: form,
     auth: false,
+  })
+}
+
+// =============================================================================
+// Patient Portal Authentication & Security
+// =============================================================================
+
+export const PATIENT_TOKEN_KEY = 'synapsehealth.patient_token'
+export const PATIENT_USER_KEY = 'synapsehealth.patient_user'
+
+export interface PatientAuthSession {
+  access_token: string
+  token_type: string
+  patient_code: string
+  full_name: string
+  expires_in: number
+  auth_method: 'pin' | 'otp'
+}
+
+export interface PatientOtpResponse {
+  contact_or_code: string
+  patient_code: string
+  full_name: string
+  masked_contact: string
+  simulated_otp?: string
+  message: string
+}
+
+export interface PatientAuthMe {
+  patient_code: string
+  full_name: string
+  contact: string | null
+  blood_group: string | null
+  auth_method: string
+  expires_at?: number
+  scope: string
+}
+
+export function getStoredPatientToken(): string | null {
+  return typeof localStorage !== 'undefined' ? localStorage.getItem(PATIENT_TOKEN_KEY) : null
+}
+
+export function getStoredPatientUser(): { patient_code: string; full_name: string } | null {
+  if (typeof localStorage === 'undefined') return null
+  const raw = localStorage.getItem(PATIENT_USER_KEY)
+  if (!raw) return null
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+export function logoutPatientPortal(): void {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem(PATIENT_TOKEN_KEY)
+    localStorage.removeItem(PATIENT_USER_KEY)
+  }
+}
+
+export async function loginPatientPortal(patientCode: string, pin: string = '1234'): Promise<PatientAuthSession> {
+  const res = await request<PatientAuthSession>('/portal/auth/login', {
+    method: 'POST',
+    json: { patient_code: patientCode, pin },
+    auth: false,
+  })
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(PATIENT_TOKEN_KEY, res.access_token)
+    localStorage.setItem(
+      PATIENT_USER_KEY,
+      JSON.stringify({ patient_code: res.patient_code, full_name: res.full_name }),
+    )
+  }
+  return res
+}
+
+export function requestPatientOtp(contactOrCode: string): Promise<PatientOtpResponse> {
+  return request<PatientOtpResponse>('/portal/auth/request-otp', {
+    method: 'POST',
+    json: { contact_or_code: contactOrCode },
+    auth: false,
+  })
+}
+
+export async function verifyPatientOtp(contactOrCode: string, otp: string): Promise<PatientAuthSession> {
+  const res = await request<PatientAuthSession>('/portal/auth/verify-otp', {
+    method: 'POST',
+    json: { contact_or_code: contactOrCode, otp },
+    auth: false,
+  })
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(PATIENT_TOKEN_KEY, res.access_token)
+    localStorage.setItem(
+      PATIENT_USER_KEY,
+      JSON.stringify({ patient_code: res.patient_code, full_name: res.full_name }),
+    )
+  }
+  return res
+}
+
+export function getPatientPortalMe(): Promise<PatientAuthMe> {
+  const token = getStoredPatientToken()
+  return request<PatientAuthMe>('/portal/auth/me', {
+    auth: false,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   })
 }
 

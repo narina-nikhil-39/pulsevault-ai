@@ -447,3 +447,50 @@ class CareTeamMessageOut(BaseModel):
     attached_ref: Optional[Dict[str, Any]] = None
     created_at: str
     acknowledged_by: List[str] = []
+
+
+# =============================================================================
+# Patient Portal Authentication & Security Schemas
+# =============================================================================
+
+class PatientLoginRequest(BaseModel):
+    """Payload to authenticate into patient health locker via ID and PIN."""
+
+    patient_code: str
+    pin: str = "1234"
+
+
+class PatientOtpRequest(BaseModel):
+    """Payload to request a mobile/ABHA OTP verification code."""
+
+    contact_or_code: str
+
+
+class PatientOtpResponse(BaseModel):
+    """Response returned upon dispatching an OTP."""
+
+    contact_or_code: str
+    patient_code: str
+    full_name: str
+    masked_contact: str
+    simulated_otp: Optional[str] = None
+    message: str
+
+
+class PatientOtpVerifyRequest(BaseModel):
+    """Payload to verify OTP and obtain signed patient JWT."""
+
+    contact_or_code: str
+    otp: str
+
+
+class PatientAuthResponse(BaseModel):
+    """Cryptographically signed patient bearer token and profile metadata."""
+
+    access_token: str
+    token_type: str = "Bearer"
+    patient_code: str
+    full_name: str
+    expires_in: int = 86400
+    auth_method: str = "pin"
+

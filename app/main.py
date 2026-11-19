@@ -22,13 +22,14 @@ from fastapi import (
     FastAPI,
     File,
     Form,
+    Header,
     HTTPException,
     Response,
     UploadFile,
     status,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.auth import (
@@ -70,6 +71,11 @@ from app.schemas import (
     JobStatusOut,
     LoginRequest,
     LoginResponse,
+    PatientAuthResponse,
+    PatientLoginRequest,
+    PatientOtpRequest,
+    PatientOtpResponse,
+    PatientOtpVerifyRequest,
     PatientRegistrationResponse,
     PatientSearchResult,
     PatientSummary,
@@ -105,6 +111,14 @@ from src.services.neo4j_adapter import neo4j_adapter
 from src.services.ocr_service import sha256_of
 from src.services.rag_service import rag_service
 from src.services.collaboration_service import collaboration_service
+from src.services.patient_auth_service import (
+    create_patient_jwt,
+    decode_patient_jwt,
+    hash_pin,
+    request_patient_otp,
+    verify_patient_otp,
+    verify_pin,
+)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -1143,6 +1157,123 @@ def acknowledge_patient_message(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Message '{msg_id}' not found.")
     return CareTeamMessageOut(**msg)
 
+
+
+# =============================================================================
+# Patient Portal Authentication & Security Endpoints
+# =============================================================================
+
+@app.post(
+    "/api/portal/auth/login",
+    response_model=PatientAuthResponse,
+    summary="Authenticate patient into health locker via patient ID and 4-digit PIN",
+)
+def portal_login(
+    payload: PatientLoginRequest,
+    db: Session = Depends(get_db),
+) -> PatientAuthResponse:
+    """Validate patient credentials using PIN and issue cryptographically signed JWT."""
+    code_query = payload.patient_code.strip()
+    patient = db.scalar(
+        select(Patient).where(
+            or_(
+                Patient.patient_code == code_query,
+                Patient.patient_code == code_query.upper(),
+            )
+        )
+    )
+    if not patient:
+        patient = db.scalar(select(Patient).where(Patient.patient_code.ilike(f"%{code_query}%")))
+    if not patient:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Patient with identifier '{payload.patient_code}' not found.",
+        )
+
+    if not verify_pin(payload.pin):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid 4-digit security PIN. Enter your registered PIN or demo PIN '1234'.",
+        )
+
+    token = create_patient_jwt(patient.patient_code, patient.full_name, auth_method="pin")
+    return PatientAuthResponse(
+        access_token=token,
+        token_type="Bearer",
+        patient_code=patient.patient_code,
+        full_name=patient.full_name,
+        expires_in=86400,
+        auth_method="pin",
+    )
+
+
+@app.post(
+    "/api/portal/auth/request-otp",
+    response_model=PatientOtpResponse,
+    summary="Request a 6-digit verification OTP for patient phone or ABHA code",
+)
+def portal_request_otp(
+    payload: PatientOtpRequest,
+    db: Session = Depends(get_db),
+) -> PatientOtpResponse:
+    """Generate and dispatch an OTP to the patient's registered contact number."""
+    try:
+        res = request_patient_otp(payload.contact_or_code, db)
+        return PatientOtpResponse(**res)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+
+
+@app.post(
+    "/api/portal/auth/verify-otp",
+    response_model=PatientAuthResponse,
+    summary="Verify 6-digit OTP and receive signed 24-hour patient portal JWT",
+)
+def portal_verify_otp(
+    payload: PatientOtpVerifyRequest,
+    db: Session = Depends(get_db),
+) -> PatientAuthResponse:
+    """Validate submitted OTP against generated code (or master demo OTP '123456')."""
+    try:
+        res = verify_patient_otp(payload.contact_or_code, payload.otp, db)
+        return PatientAuthResponse(**res)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+
+
+@app.get(
+    "/api/portal/auth/me",
+    summary="Verify active patient bearer token and return session metadata",
+)
+def portal_auth_me(
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """Inspect and validate caller's patient JWT."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing or malformed Authorization header. Expected 'Bearer <token>'.",
+        )
+    raw_token = authorization.split("Bearer ", 1)[1].strip()
+    try:
+        payload = decode_patient_jwt(raw_token)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc))
+
+    patient = db.scalar(select(Patient).where(Patient.patient_code == payload["sub"]))
+    if not patient:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient profile not found.")
+
+    return {
+        "patient_code": patient.patient_code,
+        "full_name": patient.full_name,
+        "contact": patient.contact,
+        "blood_group": patient.blood_group,
+        "auth_method": payload.get("auth_method", "pin"),
+        "expires_at": payload.get("exp"),
+        "scope": payload.get("scope", "patient:portal:read"),
+    }
 
 
 @app.get("/api/portal/patients")

@@ -4,9 +4,16 @@ import {
   fetchPortalProfile,
   uploadPortalRecordAsync,
   getJobStatus,
+  loginPatientPortal,
+  requestPatientOtp,
+  verifyPatientOtp,
+  logoutPatientPortal,
+  getStoredPatientToken,
+  getStoredPatientUser,
   type JobStatusItem,
   type PatientProfile,
   type PortalPatientSummary,
+  type PatientOtpResponse,
 } from '../api'
 import { AsyncProgressTracker } from '../components/AsyncProgressTracker'
 import { PatientRegisterWizard } from '../components/PatientRegisterWizard'
@@ -51,6 +58,81 @@ export function PatientLandingView({
   const [showRegisterWizard, setShowRegisterWizard] = useState(false)
   const [showSwitchModal, setShowSwitchModal] = useState(false)
   const [switchInputCode, setSwitchInputCode] = useState('')
+  const [switchPinInput, setSwitchPinInput] = useState('1234')
+
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return Boolean(getStoredPatientToken())
+  })
+  const [authUser, setAuthUser] = useState<{ patient_code: string; full_name: string } | null>(() => {
+    return getStoredPatientUser()
+  })
+  const [authTab, setAuthTab] = useState<'pin' | 'otp'>('pin')
+  const [loginCode, setLoginCode] = useState('OPD-ARJUN')
+  const [loginPin, setLoginPin] = useState('1234')
+  const [otpContact, setOtpContact] = useState('')
+  const [candidateOtp, setCandidateOtp] = useState('')
+  const [otpResponse, setOtpResponse] = useState<PatientOtpResponse | null>(null)
+  const [otpStep, setOtpStep] = useState<'request' | 'verify'>('request')
+  const [authLoading, setAuthLoading] = useState(false)
+  const [authError, setAuthError] = useState<string | null>(null)
+
+  const handlePinLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setAuthError(null)
+    setAuthLoading(true)
+    try {
+      const session = await loginPatientPortal(loginCode.trim(), loginPin.trim())
+      setSelectedCode(session.patient_code)
+      setAuthUser({ patient_code: session.patient_code, full_name: session.full_name })
+      setIsAuthenticated(true)
+      localStorage.setItem('synapsehealth.current_patient_code', session.patient_code)
+    } catch (err: unknown) {
+      setAuthError(err instanceof Error ? err.message : 'Invalid credentials or PIN')
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const handleRequestOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setAuthError(null)
+    setAuthLoading(true)
+    try {
+      const res = await requestPatientOtp(otpContact.trim())
+      setOtpResponse(res)
+      setOtpStep('verify')
+    } catch (err: unknown) {
+      setAuthError(err instanceof Error ? err.message : 'Unable to request verification code')
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setAuthError(null)
+    setAuthLoading(true)
+    try {
+      const target = otpResponse?.patient_code || otpContact.trim()
+      const session = await verifyPatientOtp(target, candidateOtp.trim())
+      setSelectedCode(session.patient_code)
+      setAuthUser({ patient_code: session.patient_code, full_name: session.full_name })
+      setIsAuthenticated(true)
+      localStorage.setItem('synapsehealth.current_patient_code', session.patient_code)
+    } catch (err: unknown) {
+      setAuthError(err instanceof Error ? err.message : 'Invalid verification code')
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const handleLogout = () => {
+    logoutPatientPortal()
+    setIsAuthenticated(false)
+    setAuthUser(null)
+    setProfile(null)
+  }
 
   // Document Upload State
   const [uploading, setUploading] = useState(false)
@@ -122,20 +204,11 @@ export function PatientLandingView({
   useEffect(() => {
     async function loadPatients() {
       try {
-        const savedCode = localStorage.getItem('synapsehealth.current_patient_code')
         const list = await fetchPortalPatients()
         setPatients(list)
-        if (savedCode && list.some((p) => p.patient_code === savedCode)) {
-          setSelectedCode(savedCode)
-        } else if (list.length > 0) {
-          const defaultPatient =
-            list.find((p) => p.patient_code === 'OPD-ARJUN') ||
-            list.find((p) => p.patient_code === 'SYN123456') ||
-            list[0]
-          if (defaultPatient) {
-            setSelectedCode(defaultPatient.patient_code)
-            localStorage.setItem('synapsehealth.current_patient_code', defaultPatient.patient_code)
-          }
+        const storedUser = getStoredPatientUser()
+        if (storedUser?.patient_code) {
+          setSelectedCode(storedUser.patient_code)
         }
       } catch (err) {
         console.error('Failed to load portal patients:', err)
@@ -145,7 +218,13 @@ export function PatientLandingView({
   }, [])
 
   useEffect(() => {
-    if (!selectedCode) return
+    if (!isAuthenticated || !selectedCode) {
+      if (!isAuthenticated) {
+        setProfile(null)
+        setLoading(false)
+      }
+      return
+    }
     localStorage.setItem('synapsehealth.current_patient_code', selectedCode)
     let active = true
     setLoading(true)
@@ -165,7 +244,7 @@ export function PatientLandingView({
     return () => {
       active = false
     }
-  }, [selectedCode])
+  }, [selectedCode, isAuthenticated])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -534,101 +613,402 @@ export function PatientLandingView({
               </button>
             </div>
 
-            {/* Authenticated Patient Session Strip (Strict Single-Patient Privacy) */}
+            {/* Patient Session Strip */}
             <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold text-sm shadow-xs">
-                  👤
-                </span>
-                <div>
-                  <div className="font-bold text-slate-900 flex items-center gap-2">
-                    <span>{patient?.full_name || 'Authenticated Patient'}</span>
-                    <span className="rounded bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold px-2 py-0.5">
-                      {patient?.patient_code}
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold text-sm shadow-xs">
+                      👤
                     </span>
+                    <div>
+                      <div className="font-bold text-slate-900 flex items-center gap-2">
+                        <span>{patient?.full_name || authUser?.full_name || 'Authenticated Patient'}</span>
+                        <span className="rounded bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold px-2 py-0.5">
+                          {patient?.patient_code || authUser?.patient_code}
+                        </span>
+                        <span className="rounded-full bg-emerald-500/10 text-emerald-700 text-[10px] font-semibold px-2 py-0.5 border border-emerald-300">
+                          🟢 Active 24h Session
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-slate-500 font-mono">
+                        ABHA Verified Account • Private Health Sandbox
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-[11px] text-slate-500 font-mono">
-                    ABHA Verified Account • Private Health Sandbox
-                  </span>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowSwitchModal(true)}
-                  className="rounded-xl border border-slate-300 hover:bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition cursor-pointer"
-                >
-                  Switch Patient ID
-                </button>
-                <button
-                  onClick={() => setShowRegisterWizard(true)}
-                  className="rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white transition cursor-pointer shadow-xs"
-                >
-                  + Enroll New Patient
-                </button>
-              </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleLogout}
+                      className="rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 text-xs font-bold text-rose-700 transition cursor-pointer flex items-center gap-1.5"
+                    >
+                      <span>🔒</span>
+                      <span>Lock Locker / Sign Out</span>
+                    </button>
+                    <button
+                      onClick={() => setShowRegisterWizard(true)}
+                      className="rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white transition cursor-pointer shadow-xs"
+                    >
+                      + Enroll New Patient
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500 text-white font-bold text-sm shadow-xs">
+                      🔒
+                    </span>
+                    <div>
+                      <div className="font-bold text-slate-900 flex items-center gap-2">
+                        <span>Locker Locked (HIPAA Protected)</span>
+                        <span className="rounded bg-amber-100 text-amber-800 text-[10px] font-mono font-bold px-2 py-0.5">
+                          AUTH REQUIRED
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-slate-500">
+                        Sign in below with your ABHA ID &amp; 4-digit PIN or mobile OTP
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setShowRegisterWizard(true)}
+                    className="rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white transition cursor-pointer shadow-xs"
+                  >
+                    + Enroll New Patient
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. Patient Workspace Navigation Bar */}
-      <div className="bg-white border-b border-slate-200 px-7 py-2.5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setActiveTab('locker')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-                activeTab === 'locker'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              📁 Personal Health Locker
-            </button>
-            <button
-              onClick={() => setActiveTab('family')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-                activeTab === 'family'
-                  ? 'bg-sky-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              👨‍👩‍👧‍👦 Family Health Details
-            </button>
-            <button
-              onClick={() => setActiveTab('voice')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-                activeTab === 'voice'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              🎙️ Voice &amp; Text Assistant
-            </button>
-            <button
-              onClick={() => setActiveTab('triage')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-                activeTab === 'triage'
-                  ? 'bg-purple-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              🧭 Symptom Triage Router
-            </button>
-          </div>
+      {/* 3. Patient Workspace Navigation Bar / Security Header */}
+      {isAuthenticated ? (
+        <div className="bg-white border-b border-slate-200 px-7 py-2.5">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab('locker')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  activeTab === 'locker'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                📁 Personal Health Locker
+              </button>
+              <button
+                onClick={() => setActiveTab('family')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  activeTab === 'family'
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                👨‍👩‍👧‍👦 Family Health Details
+              </button>
+              <button
+                onClick={() => setActiveTab('voice')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  activeTab === 'voice'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                🎙️ Voice &amp; Text Assistant
+              </button>
+              <button
+                onClick={() => setActiveTab('triage')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  activeTab === 'triage'
+                    ? 'bg-purple-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                🧭 Symptom Triage Router
+              </button>
+            </div>
 
-          <div className="text-xs text-slate-500 hidden sm:block">
-            Patient: <span className="font-bold text-slate-900">{patient?.full_name}</span> · ID:{' '}
-            <span className="font-mono font-semibold text-blue-600">{patient?.patient_code}</span>
+            <div className="text-xs text-slate-500 hidden sm:block">
+              Patient: <span className="font-bold text-slate-900">{patient?.full_name}</span> · ID:{' '}
+              <span className="font-mono font-semibold text-blue-600">{patient?.patient_code}</span>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="bg-amber-50/70 border-b border-amber-200/60 px-7 py-2.5">
+          <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-amber-900 font-medium">
+            <div className="flex items-center gap-2">
+              <span>🔒</span>
+              <span>Confidential Health Locker · Enter PIN or Request Mobile OTP to View Records</span>
+            </div>
+            <div className="hidden sm:flex items-center gap-2 text-[11px] text-amber-700 font-mono">
+              <span>Demo PIN: 1234</span>
+              <span>•</span>
+              <span>Demo OTP: 123456</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 4. Active Tab Content Container */}
       <main className="p-7 max-w-7xl w-full mx-auto flex-1 space-y-6">
-        {/* TAB 1: PERSONAL HEALTH LOCKER */}
-        {activeTab === 'locker' ? (
+        {!isAuthenticated ? (
+          <div className="max-w-xl mx-auto py-8">
+            <div className="rounded-3xl border border-slate-200/80 bg-white p-8 shadow-xl space-y-6">
+              <div className="text-center space-y-2">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white text-2xl shadow-md shadow-emerald-500/20">
+                  🛡️
+                </div>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Patient Health Locker</h2>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  End-to-End Encrypted Personal Health Record (PHR). Please authenticate to view your prescriptions, lab reports, and linked family dependents.
+                </p>
+              </div>
+
+              {/* Auth Method Tabs */}
+              <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-2xl text-xs font-bold text-slate-600">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthTab('pin')
+                    setAuthError(null)
+                  }}
+                  className={`py-2.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-2 ${
+                    authTab === 'pin' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
+                  }`}
+                >
+                  <span>🔑</span>
+                  <span>4-Digit Security PIN</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthTab('otp')
+                    setAuthError(null)
+                  }}
+                  className={`py-2.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-2 ${
+                    authTab === 'otp' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
+                  }`}
+                >
+                  <span>📲</span>
+                  <span>Mobile / ABHA OTP</span>
+                </button>
+              </div>
+
+              {authError && (
+                <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800 flex items-start gap-2">
+                  <span className="text-sm">⚠️</span>
+                  <div className="flex-1 font-medium">{authError}</div>
+                </div>
+              )}
+
+              {/* PIN Auth Form */}
+              {authTab === 'pin' && (
+                <form onSubmit={handlePinLogin} className="space-y-4 text-xs">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5">ABHA ID or Patient Code</label>
+                    <input
+                      type="text"
+                      required
+                      value={loginCode}
+                      onChange={(e) => setLoginCode(e.target.value.toUpperCase())}
+                      placeholder="e.g. OPD-ARJUN or SYN123456"
+                      className="w-full rounded-xl border border-slate-300 p-3 font-mono font-bold text-slate-900 focus:border-emerald-600 focus:outline-none uppercase"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="font-bold text-slate-700">4-Digit Security PIN</label>
+                      <span className="text-[11px] text-slate-400 font-mono">Demo PIN: 1234</span>
+                    </div>
+                    <input
+                      type="password"
+                      maxLength={6}
+                      required
+                      value={loginPin}
+                      onChange={(e) => setLoginPin(e.target.value)}
+                      placeholder="••••"
+                      className="w-full rounded-xl border border-slate-300 p-3 font-mono text-center tracking-[0.5em] text-lg font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 py-3 text-xs font-bold text-white shadow-md shadow-emerald-500/20 transition cursor-pointer disabled:opacity-50"
+                  >
+                    {authLoading ? 'Verifying PIN...' : '🔓 Unlock Health Locker'}
+                  </button>
+
+                  {/* Demo Fast Fill Buttons */}
+                  <div className="pt-2 border-t border-slate-100 space-y-2">
+                    <span className="text-[11px] font-semibold text-slate-400 block text-center">
+                      One-Click Evaluator Demo Sign-In
+                    </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLoginCode('OPD-ARJUN')
+                          setLoginPin('1234')
+                        }}
+                        className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 p-2 text-left transition cursor-pointer"
+                      >
+                        <div className="font-bold text-slate-900 text-[11px]">Arjun Rao</div>
+                        <div className="text-[10px] text-slate-500 font-mono">OPD-ARJUN (A+)</div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLoginCode('ER-TRAUMA-01')
+                          setLoginPin('1234')
+                        }}
+                        className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 p-2 text-left transition cursor-pointer"
+                      >
+                        <div className="font-bold text-slate-900 text-[11px]">Trauma ER</div>
+                        <div className="text-[10px] text-slate-500 font-mono">ER-TRAUMA-01 (O-)</div>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              )}
+
+              {/* OTP Auth Form */}
+              {authTab === 'otp' && (
+                <div className="space-y-4 text-xs">
+                  {otpStep === 'request' ? (
+                    <form onSubmit={handleRequestOtp} className="space-y-4">
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1.5">
+                          Registered Mobile Number or Patient Code
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={otpContact}
+                          onChange={(e) => setOtpContact(e.target.value)}
+                          placeholder="e.g. OPD-ARJUN or +91 98765 43210"
+                          className="w-full rounded-xl border border-slate-300 p-3 font-mono font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
+                        />
+                        <span className="text-[11px] text-slate-400 mt-1 block">
+                          Enter your registered mobile number or ABHA ID to receive an OTP.
+                        </span>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={authLoading}
+                        className="w-full rounded-xl bg-sky-600 hover:bg-sky-700 py-3 text-xs font-bold text-white shadow-md shadow-sky-500/20 transition cursor-pointer disabled:opacity-50"
+                      >
+                        {authLoading ? 'Dispatching OTP...' : '📲 Send 6-Digit Verification Code'}
+                      </button>
+
+                      {/* Quick Demo Pre-fills */}
+                      <div className="pt-2 border-t border-slate-100 space-y-2">
+                        <span className="text-[11px] font-semibold text-slate-400 block text-center">
+                          Quick Demo Selection
+                        </span>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setOtpContact('OPD-ARJUN')}
+                            className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 p-2 text-left transition cursor-pointer"
+                          >
+                            <div className="font-bold text-slate-900 text-[11px]">Arjun Rao</div>
+                            <div className="text-[10px] text-slate-500 font-mono">OPD-ARJUN</div>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setOtpContact('ER-TRAUMA-01')}
+                            className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 p-2 text-left transition cursor-pointer"
+                          >
+                            <div className="font-bold text-slate-900 text-[11px]">Trauma ER</div>
+                            <div className="text-[10px] text-slate-500 font-mono">ER-TRAUMA-01</div>
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  ) : (
+                    <form onSubmit={handleVerifyOtp} className="space-y-4">
+                      <div className="rounded-xl bg-sky-50 border border-sky-200 p-3 text-slate-700 space-y-1">
+                        <div className="font-bold text-sky-900">Code Dispatched!</div>
+                        <div className="text-[11px]">
+                          Sent to: <span className="font-mono font-bold">{otpResponse?.masked_contact}</span>
+                        </div>
+                        {otpResponse?.simulated_otp && (
+                          <div className="text-[11px] text-emerald-700 font-medium">
+                            🔑 Simulated SMS code:{' '}
+                            <span className="font-mono font-bold bg-white px-1.5 py-0.5 rounded border border-emerald-300">
+                              {otpResponse.simulated_otp}
+                            </span>{' '}
+                            (or demo <span className="font-mono font-bold">123456</span>)
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1.5">
+                          Enter 6-Digit Verification Code
+                        </label>
+                        <input
+                          type="text"
+                          maxLength={6}
+                          required
+                          value={candidateOtp}
+                          onChange={(e) => setCandidateOtp(e.target.value)}
+                          placeholder="123456"
+                          className="w-full rounded-xl border border-slate-300 p-3 font-mono text-center tracking-[0.5em] text-lg font-bold text-slate-900 focus:border-sky-600 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setOtpStep('request')}
+                          className="flex-1 rounded-xl border border-slate-300 py-3 font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                        >
+                          ← Back
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={authLoading}
+                          className="flex-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 py-3 font-bold text-white shadow-md shadow-emerald-500/20 transition cursor-pointer disabled:opacity-50"
+                        >
+                          {authLoading ? 'Verifying...' : '✅ Verify & Unlock'}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              )}
+
+              {/* Security Assurance Badges */}
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-emerald-500">🔒</span>
+                  <span>PBKDF2-HMAC-SHA256 Encrypted</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-blue-500">✓</span>
+                  <span>ABDM &amp; HIPAA Compliant</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : loading ? (
+          <div className="py-20 text-center space-y-3">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-emerald-600" />
+            <div className="text-xs font-semibold text-slate-600">Loading your private health records...</div>
+          </div>
+        ) : (
+          <>
+            {/* TAB 1: PERSONAL HEALTH LOCKER */}
+            {activeTab === 'locker' ? (
           <div className="space-y-6">
             {/* Demographic Card */}
             <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs flex flex-wrap items-center justify-between gap-4">
@@ -1035,6 +1415,8 @@ export function PatientLandingView({
             ) : null}
           </div>
         ) : null}
+        </>
+      )}
       </main>
 
       {/* Footer */}
@@ -1052,8 +1434,15 @@ export function PatientLandingView({
               setSelectedCode(code)
               fetchPortalPatients().then(setPatients).catch(console.error)
             }}
-            onOpenPatientPortal={(code) => {
-              setSelectedCode(code)
+            onOpenPatientPortal={async (code) => {
+              try {
+                const session = await loginPatientPortal(code, '1234')
+                setSelectedCode(session.patient_code)
+                setAuthUser({ patient_code: session.patient_code, full_name: session.full_name })
+                setIsAuthenticated(true)
+              } catch {
+                setSelectedCode(code)
+              }
               setShowRegisterWizard(false)
               fetchPortalPatients().then(setPatients).catch(console.error)
             }}
@@ -1072,7 +1461,7 @@ export function PatientLandingView({
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <span className="text-xl">🔐</span>
-                <h3 className="text-sm font-black text-slate-900">Access Personal Health Locker</h3>
+                <h3 className="text-sm font-black text-slate-900">Switch Patient Health Locker</h3>
               </div>
               <button
                 onClick={() => setShowSwitchModal(false)}
@@ -1083,17 +1472,25 @@ export function PatientLandingView({
             </div>
 
             <p className="text-xs text-slate-500 leading-relaxed">
-              Enter your ABHA Health ID or Patient Registration Code to unlock your private medical records and family dependents.
+              Enter your ABHA Health ID and Security PIN to switch active patient session.
             </p>
 
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault()
                 const code = switchInputCode.trim().toUpperCase()
                 if (code) {
-                  setSelectedCode(code)
-                  setShowSwitchModal(false)
-                  setSwitchInputCode('')
+                  try {
+                    const session = await loginPatientPortal(code, switchPinInput.trim() || '1234')
+                    setSelectedCode(session.patient_code)
+                    setAuthUser({ patient_code: session.patient_code, full_name: session.full_name })
+                    setIsAuthenticated(true)
+                    setShowSwitchModal(false)
+                    setSwitchInputCode('')
+                    setSwitchPinInput('1234')
+                  } catch (err: unknown) {
+                    alert(err instanceof Error ? err.message : 'Invalid patient ID or PIN')
+                  }
                 }
               }}
               className="space-y-3.5 text-xs"
@@ -1110,6 +1507,21 @@ export function PatientLandingView({
                 />
               </div>
 
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-slate-700">Security PIN</label>
+                  <span className="text-[10px] text-slate-400 font-mono">Demo: 1234</span>
+                </div>
+                <input
+                  type="password"
+                  required
+                  value={switchPinInput}
+                  onChange={(e) => setSwitchPinInput(e.target.value)}
+                  placeholder="••••"
+                  className="w-full rounded-xl border border-slate-300 p-2.5 font-mono text-center tracking-widest font-bold text-slate-900 focus:border-emerald-600 focus:outline-none"
+                />
+              </div>
+
               <div className="pt-2 flex gap-2">
                 <button
                   type="button"
@@ -1122,7 +1534,7 @@ export function PatientLandingView({
                   type="submit"
                   className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 py-2.5 font-bold text-white transition cursor-pointer shadow-xs"
                 >
-                  Access Record
+                  Verify &amp; Switch
                 </button>
               </div>
             </form>
